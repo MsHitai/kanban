@@ -1,5 +1,6 @@
 import java.util.HashMap;
 
+
 public class Manager {
 
     String name;
@@ -8,17 +9,50 @@ public class Manager {
     String status;
     boolean isDone;
 
-    Task task = new Task(name, description, uniqueID, status, isDone);
-
     HashMap<Integer, Task> tasks = new HashMap<>();
-
-    SubTask subTask = new SubTask(name, description, uniqueID, status, isDone);
-
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
-
-    Epic epic = new Epic(name, description, uniqueID, status, isDone);
-
     HashMap<Integer, Epic> epics = new HashMap<>();
 
+    public void createTask() {
+        name = "Новая задача";
+        description = "Что нужно сделать";
+        uniqueID++;
+        Task task = new Task(name, description, uniqueID, "NEW", false);
+        tasks.put(uniqueID, task);
+    }
+
+    public void createSubTask() {
+        name = "Новая подзадача";
+        description = "Что нужно сделать";
+        uniqueID++;
+        SubTask subTask = new SubTask(name, description, uniqueID, "NEW", false);
+        subTasks.put(uniqueID, subTask);
+    }
+
+    public void createEpic() {
+        name = "Новый эпик";
+        description = "Что нужно сделать";
+        uniqueID++;
+        Epic epic = new Epic(name, description, uniqueID, "NEW", false);
+        epics.put(uniqueID, epic);
+    }
+
+    public void deleteTaskByID(int number) {
+        for (Integer idNumber : tasks.keySet()) {
+            if (!tasks.isEmpty()) {
+                if (idNumber != number) {
+                    continue;
+                }
+                if (tasks.containsKey(idNumber)) {
+                    tasks.remove(idNumber);
+                    return;
+                } else {
+                    System.out.println("Нет задачи под таким номером.");
+                }
+            } else {
+                System.out.println("Список задач пуст.");
+            }
+        }
+    }
 
 }
