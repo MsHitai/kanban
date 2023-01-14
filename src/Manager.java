@@ -13,23 +13,26 @@ public class Manager {
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
     HashMap<Integer, Epic> epics = new HashMap<>();
 
-    public int createID(){
+    public int createID() {
         return ++uniqueID;
     }
 
-    public void createTask(Task task, int uniqueID) {
-        tasks.put(uniqueID, task);
+    public void createTask(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
+        Task task = new Task(newName, newDescription, newID, newStatus, isDone);
+        tasks.put(newID, task);
     }
 
-    public void createSubTask(SubTask subTask, int uniqueID) {
-        subTasks.put(uniqueID, subTask);
+    public void createSubTask(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
+        SubTask subTask = new SubTask(newName, newDescription, newID, newStatus, isDone);
+        subTasks.put(newID, subTask);
     }
 
-    public void createEpic(Epic epic, int uniqueID) {
-        epics.put(uniqueID, epic);
+    public void createEpic(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
+        Epic epic = new Epic(newName, newDescription, newID, newStatus, isDone);
+        epics.put(newID, epic);
     }
 
-    public void deleteTaskByID(HashMap hashMap, int number) {
+    public void deleteTaskByID(HashMap<Integer, ?> hashMap, int number) {
         if (!hashMap.isEmpty()) {
             if (hashMap.containsKey(number)) {
                 hashMap.remove(number);
@@ -38,6 +41,32 @@ public class Manager {
             }
         } else {
             System.out.println("Список задач пуст.");
+        }
+    }
+
+    public void deleteTasks(HashMap<Integer, ?> hashMap) {
+        if (!hashMap.isEmpty()) {
+            hashMap.clear();
+        } else {
+            System.out.println("Список задач пуст.");
+        }
+    }
+
+    public void listAllTasks() {
+        if (!tasks.isEmpty()) {
+            System.out.println(tasks);
+        } else {
+            System.out.println("Список задач пуст.");
+        }
+        if (!subTasks.isEmpty()) {
+            System.out.println(subTasks);
+        } else {
+            System.out.println("Список подзадач пуст.");
+        }
+        if (!epics.isEmpty()) {
+            System.out.println(epics);
+        } else {
+            System.out.println("Список епиков пуст.");
         }
     }
 
