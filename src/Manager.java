@@ -13,34 +13,26 @@ public class Manager {
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
     HashMap<Integer, Epic> epics = new HashMap<>();
 
-    public void createTask() {
-        name = "Новая задача";
-        description = "Что нужно сделать";
-        uniqueID++;
-        Task task = new Task(name, description, uniqueID, "NEW", false);
+    public int createID(){
+        return ++uniqueID;
+    }
+
+    public void createTask(Task task, int uniqueID) {
         tasks.put(uniqueID, task);
     }
 
-    public void createSubTask() {
-        name = "Новая подзадача";
-        description = "Что нужно сделать";
-        uniqueID++;
-        SubTask subTask = new SubTask(name, description, uniqueID, "NEW", false);
+    public void createSubTask(SubTask subTask, int uniqueID) {
         subTasks.put(uniqueID, subTask);
     }
 
-    public void createEpic() {
-        name = "Новый эпик";
-        description = "Что нужно сделать";
-        uniqueID++;
-        Epic epic = new Epic(name, description, uniqueID, "NEW", false);
+    public void createEpic(Epic epic, int uniqueID) {
         epics.put(uniqueID, epic);
     }
 
-    public void deleteTaskByID(int number) {
-        if (!tasks.isEmpty()) {
-            if (tasks.containsKey(number)) {
-                tasks.remove(number);
+    public void deleteTaskByID(HashMap hashMap, int number) {
+        if (!hashMap.isEmpty()) {
+            if (hashMap.containsKey(number)) {
+                hashMap.remove(number);
             } else {
                 System.out.println("Нет задачи под таким номером.");
             }
