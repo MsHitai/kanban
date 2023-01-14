@@ -38,20 +38,14 @@ public class Manager {
     }
 
     public void deleteTaskByID(int number) {
-        for (Integer idNumber : tasks.keySet()) {
-            if (!tasks.isEmpty()) {
-                if (idNumber != number) {
-                    continue;
-                }
-                if (tasks.containsKey(idNumber)) {
-                    tasks.remove(idNumber);
-                    return;
-                } else {
-                    System.out.println("Нет задачи под таким номером.");
-                }
+        if (!tasks.isEmpty()) {
+            if (tasks.containsKey(number)) {
+                tasks.remove(number);
             } else {
-                System.out.println("Список задач пуст.");
+                System.out.println("Нет задачи под таким номером.");
             }
+        } else {
+            System.out.println("Список задач пуст.");
         }
     }
 
