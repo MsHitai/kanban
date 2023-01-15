@@ -16,6 +16,11 @@ public class Manager {
         tasks.put(task.uniqueID, task);
     }
 
+    public void refreshTask(String newName, String newDescription, int taskID, String status, boolean isDone){
+        Task task = new Task(newName, newDescription, taskID, status, isDone);
+        tasks.put(taskID, task);
+    }
+
     public void createSubTask(SubTask subTask) {
         subTasks.put(subTask.uniqueID, subTask);
     }
@@ -24,7 +29,19 @@ public class Manager {
         epics.put(epic.uniqueID, epic);
     }
 
-    public void deleteTaskByID(HashMap<Integer, ?> hashMap, int number) {
+    public void getTaskByID(HashMap<Integer, Task> hashMap, int number){
+        if (!hashMap.isEmpty()) {
+            if (hashMap.containsKey(number)) {
+                System.out.println(hashMap.get(number));
+            } else {
+                System.out.println("Нет задачи под таким номером.");
+            }
+        } else {
+            System.out.println("Список задач пуст.");
+        }
+    }
+
+    public void deleteTaskByID(HashMap<Integer, Task> hashMap, int number) {
         if (!hashMap.isEmpty()) {
             if (hashMap.containsKey(number)) {
                 hashMap.remove(number);
@@ -36,7 +53,7 @@ public class Manager {
         }
     }
 
-    public void deleteTasks(HashMap<Integer, ?> hashMap) {
+    public void deleteAllTasks(HashMap<Integer, Task> hashMap) {
         if (!hashMap.isEmpty()) {
             hashMap.clear();
         } else {
@@ -50,15 +67,21 @@ public class Manager {
         } else {
             System.out.println("Список задач пуст.");
         }
-        if (!epics.isEmpty()) {
-            System.out.println(epics);
-        } else {
-            System.out.println("Список епиков пуст.");
-        }
+    }
+
+    public void listAllSubTasks(){
         if (!subTasks.isEmpty()) {
             System.out.println(subTasks);
         } else {
             System.out.println("Список подзадач пуст.");
+        }
+    }
+
+    public void listAllEpics(){
+        if (!epics.isEmpty()) {
+            System.out.println(epics);
+        } else {
+            System.out.println("Список епиков пуст.");
         }
     }
 

@@ -8,12 +8,15 @@ public class Main {
                 "NEW", false);
         Task task2 = new Task("Погулять с хомяком", "Три раза", manager.createID(),
                 "NEW", false);
+
         Epic epic1 = new Epic("Переехать", "До понедельника", manager.createID(),
                 "NEW", false);
         SubTask subTask1 = new SubTask("Упаковать кота", "Не забыть его корм!", manager.createID(),
                 "NEW", false, epic1.uniqueID);
         SubTask subTask2 = new SubTask("Попрощаться со всеми", "Не забыть соседей!", manager.createID(),
                 "NEW", false, epic1.uniqueID);
+
+
         Epic epic2 = new Epic("Построить дом", "Из бревен", manager.createID(),
                 "NEW", false);
         SubTask subTask3 = new SubTask("Заказать бревна", "Нужны черные!", manager.createID(),
@@ -30,13 +33,27 @@ public class Main {
 
         System.out.println("У нас создались следующие задачи: ");
         manager.listAllTasks();
+        manager.listAllEpics();
+        manager.listAllSubTasks();
 
-        System.out.println("Удаляем задачу под уникальным номером: 1. Остаётся в списке задач:");
+        System.out.println("Находим задачу под номером 2");
+        manager.getTaskByID(manager.tasks, 2);
+
+        System.out.println("Обновляем задачу под номером 1 на статус 'в процессе'. Проверяем...");
+        manager.refreshTask("Покормить кота", "В 14-00", task1.uniqueID, "IN_PROGRESS",
+                false);
+        manager.getTaskByID(manager.tasks, 1);
+
+        System.out.println("Удаляем задачу под номером: 1. Остаётся в списке задач:");
         manager.deleteTaskByID(manager.tasks, 1);
         manager.listAllTasks();
-        //todo change the delete method of subtasks according to an epic
-        System.out.println("Удаляем все подзадачи... Остаётся в списке задач:");
-        manager.deleteTasks(manager.subTasks);
+
+        System.out.println("Удаляем список задач, проверяем...");
+        manager.deleteAllTasks(manager.tasks);
         manager.listAllTasks();
+
+        
+        System.out.println("Удаляем эпик под номером 3 со всеми подзадачами... Остается: ");
+
     }
 }

@@ -1,4 +1,7 @@
-public class Epic extends Task{
+import java.util.ArrayList;
+
+public class Epic extends Task {
+    ArrayList<SubTask> mySubTasks;
 
     public Epic(String name, String description, int uniqueID, String status, boolean isDone) {
         super(name, description, uniqueID, status, isDone);
@@ -6,12 +9,17 @@ public class Epic extends Task{
 
     @Override
     public String toString() {
-        return "Epic{" +
+        String result = "Epic{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", uniqueID=" + uniqueID +
                 ", status='" + status + '\'' +
-                ", isDone=" + isDone +
-                '}';
+                ", isDone=" + isDone;
+        if (mySubTasks != null) {
+            result = result + ", mySubTasks=" + mySubTasks.size() + '}';
+        } else {
+            result = result + ", mySubTasks=null" + '}';
+        }
+        return result;
     }
 }
