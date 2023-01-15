@@ -4,6 +4,9 @@ public class SubTask extends Task{
     public SubTask(String name, String description, int uniqueID, String status, boolean isDone, int myEpicID) {
         super(name, description, uniqueID, status, isDone);
         this.myEpicID = myEpicID;
+        if (status.equals("DONE")){
+            isDone = true;
+        }
     }
 
     @Override

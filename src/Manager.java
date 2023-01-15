@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -16,7 +17,7 @@ public class Manager {
         tasks.put(task.uniqueID, task);
     }
 
-    public void refreshTask(String newName, String newDescription, int taskID, String status, boolean isDone){
+    public void refreshTask(String newName, String newDescription, int taskID, String status, boolean isDone) {
         Task task = new Task(newName, newDescription, taskID, status, isDone);
         tasks.put(taskID, task);
     }
@@ -29,7 +30,7 @@ public class Manager {
         epics.put(epic.uniqueID, epic);
     }
 
-    public void getTaskByID(HashMap<Integer, Task> hashMap, int number){
+    public void getTaskByID(HashMap<Integer, Task> hashMap, int number) {
         if (!hashMap.isEmpty()) {
             if (hashMap.containsKey(number)) {
                 System.out.println(hashMap.get(number));
@@ -69,7 +70,7 @@ public class Manager {
         }
     }
 
-    public void listAllSubTasks(){
+    public void listAllSubTasks() {
         if (!subTasks.isEmpty()) {
             System.out.println(subTasks);
         } else {
@@ -77,11 +78,25 @@ public class Manager {
         }
     }
 
-    public void listAllEpics(){
+    public void listAllEpics() {
         if (!epics.isEmpty()) {
             System.out.println(epics);
         } else {
             System.out.println("Список епиков пуст.");
+        }
+    }
+
+    public void sortSubTasksByEpics(Epic epic, int epicID) {
+        ArrayList<SubTask> subtasks = new ArrayList<>();
+        for (SubTask subTask : subTasks.values()) {
+            if (subTask.myEpicID == epicID) {
+                subtasks.add(subTask);
+            }
+        }
+        if (subtasks.isEmpty()) {
+            System.out.println("Нет подходящих подзадач для этого эпика.");
+        } else {
+            epic.fillMySubTasks(subtasks);
         }
     }
 

@@ -7,6 +7,25 @@ public class Epic extends Task {
         super(name, description, uniqueID, status, isDone);
     }
 
+    public void fillMySubTasks(ArrayList<SubTask> subTasks){
+        mySubTasks = subTasks;
+    }
+
+    public boolean checkIsDone(){
+        if(mySubTasks != null){
+            int total = mySubTasks.size();
+            for (SubTask mySubTask : mySubTasks) {
+                if (mySubTask.isDone) {
+                    total--;
+                }
+            }
+            isDone = total == 0;
+        }
+        else {
+            System.out.println("Нужно отсортировать подзадачи эпика.");
+        }
+        return isDone;
+    }
     @Override
     public String toString() {
         String result = "Epic{" +

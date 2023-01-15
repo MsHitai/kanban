@@ -28,8 +28,10 @@ public class Main {
         manager.createEpic(epic1);
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
+        manager.sortSubTasksByEpics(epic1, epic1.uniqueID);
         manager.createEpic(epic2);
         manager.createSubTask(subTask3);
+        manager.sortSubTasksByEpics(epic2, epic2.uniqueID);
 
         System.out.println("У нас создались следующие задачи: ");
         manager.listAllTasks();
@@ -52,8 +54,10 @@ public class Main {
         manager.deleteAllTasks(manager.tasks);
         manager.listAllTasks();
 
-        
-        System.out.println("Удаляем эпик под номером 3 со всеми подзадачами... Остается: ");
+        System.out.println("Проверяем выполнен ли первый эпик...");
+        System.out.println(epic1.checkIsDone());
+
+        //System.out.println("Удаляем эпик под номером 3 со всеми подзадачами... Остается: ");
 
     }
 }
