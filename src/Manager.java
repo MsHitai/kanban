@@ -30,7 +30,7 @@ public class Manager {
         tasks.put(taskID, task);
     }
 
-    public void getTaskByID(HashMap<Integer, ?> hashMap, int number) { // выдает по номеру задачу/подзадачу/эпик
+    public void getAnyTaskByID(HashMap<Integer, ?> hashMap, int number) { // выдает по номеру задачу/подзадачу/эпик
         if (hashMap != null) {
             if (hashMap.containsKey(number)) {
                 System.out.println(hashMap.get(number));
@@ -79,7 +79,6 @@ public class Manager {
         subTasks.put(subTaskID, subTask);
         if (epics.containsKey(number)) {
             sortSubTasksByEpics(getEpicByID(epics, number), number);
-
         }
     }
 
@@ -96,6 +95,7 @@ public class Manager {
             for (SubTask subTask : hashMap.values()) {
                 if (subTask.uniqueID == number) {
                     hashMap.remove(subTask.uniqueID);
+                    break;
                 }
             }
         } else {
@@ -117,6 +117,14 @@ public class Manager {
         } else {
             System.out.println("Список епиков пуст.");
         }
+    }
+
+    public void refreshEpic(String newName, String newDescription, int epicID, String status, boolean isDone) {
+        Epic epic = new Epic(newName, newDescription, epicID, status, isDone);
+        sortSubTasksByEpics(epic, epicID);
+        epic.checkStatus();
+        epic.checkIsDone();
+        epics.put(epicID, epic);
     }
 
     private Epic getEpicByID(HashMap<Integer, Epic> hashMap, int number) {
@@ -143,6 +151,19 @@ public class Manager {
             }
         } else {
             System.out.println("Список эпиков пуст.");
+        }
+    }
+
+    public void deleteAllEpics(){
+        if (epics != null){
+            epics.clear();
+        } else {
+            System.out.println("Список эпиков пуст.");
+        }
+        if (subTasks != null){
+            subTasks.clear();
+        } else {
+            System.out.println("Список подзадач пуст.");
         }
     }
 

@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-public class SubTask extends Task{
+public class SubTask extends Task {
     protected int myEpicID;
     boolean isDone;
 
@@ -11,7 +11,7 @@ public class SubTask extends Task{
     public SubTask(String name, String description, int uniqueID, String status, boolean isDone, int myEpicID) {
         super(name, description, uniqueID, status, isDone);
         this.myEpicID = myEpicID;
-        if (status.equals("DONE")){
+        if (status.equals("DONE")) {
             this.isDone = true;
         }
         this.name = name;
@@ -24,7 +24,10 @@ public class SubTask extends Task{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SubTask subTask = (SubTask) o;
-        return myEpicID == subTask.myEpicID && uniqueID == subTask.uniqueID && name.equals(subTask.name) && description.equals(subTask.description);
+        return myEpicID == subTask.myEpicID
+                && uniqueID == subTask.uniqueID
+                && name.equals(subTask.name)
+                && description.equals(subTask.description);
     }
 
     @Override

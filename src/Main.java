@@ -39,12 +39,12 @@ public class Main {
         manager.listAllSubTasks();
 
         System.out.println("Находим задачу под номером 2");
-        manager.getTaskByID(manager.tasks, 2);
+        manager.getAnyTaskByID(manager.tasks, 2);
 
-        System.out.println("Обновляем задачу под номером 1 на статус 'в процессе'. Проверяем...");
-        manager.refreshTask("Покормить кота", "В 14-00", task1.uniqueID, "IN_PROGRESS",
+        System.out.println("Обновляем задачу под номером 1 на статус 'выполнено'. Проверяем...");
+        manager.refreshTask("Покормить кота", "В 14-00", task1.uniqueID, "DONE",
                 false);
-        manager.getTaskByID(manager.tasks, 1);
+        manager.getAnyTaskByID(manager.tasks, 1);
 
         System.out.println("Удаляем задачу под номером: 1. Остаётся в списке задач:");
         manager.deleteTaskByID(manager.tasks, 1);
@@ -57,8 +57,18 @@ public class Main {
         System.out.println("Получаем список всех подзадач первого эпика...");
         manager.getSubTasksByEpics(epic1);
 
+        System.out.println("Меняем статус подзадачи 'Упаковать кота' на 'в процессе'. Проверяем: ");
+        manager.refreshSubTask("Упаковать кота", "Не забыть его корм!", subTask1.uniqueID,
+                "IN_PROGRESS", false, epic1.uniqueID);
+        manager.getAnyTaskByID(manager.subTasks, subTask1.uniqueID);
+
         System.out.println("Проверяем статус первого эпика: ");
         System.out.println(epic1.checkStatus());
+
+        System.out.println("Попробуем поменять статус первого эпика вручную на 'выполнен'. Проверяем:");
+        manager.refreshEpic("Переехать", "До понедельника", epic1.uniqueID,
+                "DONE", true);
+        manager.getAnyTaskByID(manager.epics, epic1.uniqueID);
 
         System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'. Проверяем: ");
         manager.refreshSubTask("Заказать бревна", "Нужны черные!", subTask3.uniqueID,
@@ -70,9 +80,12 @@ public class Main {
 
         System.out.println("Удаляем второй эпик. Проверяем его по ID и смотрим список его подзадач: ");
         manager.deleteEpicByID(manager.epics, epic2.uniqueID);
-        manager.getTaskByID(manager.epics, epic2.uniqueID);
+        manager.getAnyTaskByID(manager.epics, epic2.uniqueID);
         manager.getSubTasksByEpics(epic2);
 
-
+        System.out.println("Удаляем все эпики. Проверяем: ");
+        manager.deleteAllEpics();
+        manager.listAllEpics();
+        manager.listAllSubTasks();
     }
 }
