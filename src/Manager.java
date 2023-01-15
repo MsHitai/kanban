@@ -2,12 +2,7 @@ import java.util.HashMap;
 
 
 public class Manager {
-
-    String name;
-    String description;
     int uniqueID;
-    String status;
-    boolean isDone;
 
     HashMap<Integer, Task> tasks = new HashMap<>();
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
@@ -17,19 +12,16 @@ public class Manager {
         return ++uniqueID;
     }
 
-    public void createTask(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
-        Task task = new Task(newName, newDescription, newID, newStatus, isDone);
-        tasks.put(newID, task);
+    public void createTask(Task task) {
+        tasks.put(task.uniqueID, task);
     }
 
-    public void createSubTask(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
-        SubTask subTask = new SubTask(newName, newDescription, newID, newStatus, isDone);
-        subTasks.put(newID, subTask);
+    public void createSubTask(SubTask subTask) {
+        subTasks.put(subTask.uniqueID, subTask);
     }
 
-    public void createEpic(String newName, String newDescription, int newID, String newStatus, boolean isDone) {
-        Epic epic = new Epic(newName, newDescription, newID, newStatus, isDone);
-        epics.put(newID, epic);
+    public void createEpic(Epic epic) {
+        epics.put(epic.uniqueID, epic);
     }
 
     public void deleteTaskByID(HashMap<Integer, ?> hashMap, int number) {
@@ -58,15 +50,15 @@ public class Manager {
         } else {
             System.out.println("Список задач пуст.");
         }
-        if (!subTasks.isEmpty()) {
-            System.out.println(subTasks);
-        } else {
-            System.out.println("Список подзадач пуст.");
-        }
         if (!epics.isEmpty()) {
             System.out.println(epics);
         } else {
             System.out.println("Список епиков пуст.");
+        }
+        if (!subTasks.isEmpty()) {
+            System.out.println(subTasks);
+        } else {
+            System.out.println("Список подзадач пуст.");
         }
     }
 
