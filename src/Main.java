@@ -60,14 +60,19 @@ public class Main {
         System.out.println("Проверяем статус первого эпика: ");
         System.out.println(epic1.checkStatus());
 
-        System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'");
-
+        System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'. Проверяем: ");
+        manager.refreshSubTask("Заказать бревна", "Нужны черные!", subTask3.uniqueID,
+                "DONE", false, epic2.uniqueID);
+        manager.getSubTasksByEpics(epic2);
 
         System.out.println("Проверяем выполнен ли второй эпик...");
         System.out.println(epic2.checkIsDone());
 
+        System.out.println("Удаляем второй эпик. Проверяем его по ID и смотрим список его подзадач: ");
+        manager.deleteEpicByID(manager.epics, epic2.uniqueID);
+        manager.getTaskByID(manager.epics, epic2.uniqueID);
+        manager.getSubTasksByEpics(epic2);
 
-        //System.out.println("Удаляем эпик под номером 3 со всеми подзадачами... Остается: ");
 
     }
 }
