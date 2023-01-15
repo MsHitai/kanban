@@ -54,8 +54,18 @@ public class Main {
         manager.deleteAllTasks(manager.tasks);
         manager.listAllTasks();
 
-        System.out.println("Проверяем выполнен ли первый эпик...");
-        System.out.println(epic1.checkIsDone());
+        System.out.println("Получаем список всех подзадач первого эпика...");
+        manager.getSubTasksByEpics(epic1);
+
+        System.out.println("Проверяем статус первого эпика: ");
+        System.out.println(epic1.checkStatus());
+
+        System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'");
+
+
+        System.out.println("Проверяем выполнен ли второй эпик...");
+        System.out.println(epic2.checkIsDone());
+
 
         //System.out.println("Удаляем эпик под номером 3 со всеми подзадачами... Остается: ");
 

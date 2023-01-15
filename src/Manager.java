@@ -100,4 +100,12 @@ public class Manager {
         }
     }
 
+    public void getSubTasksByEpics(Epic epic) {
+        if (epic.mySubTasks != null) {
+            System.out.println(epic.mySubTasks);
+        } else {
+            System.out.println("Нет подходящих подзадач для этого эпика.");
+        }
+    }
+
 }
