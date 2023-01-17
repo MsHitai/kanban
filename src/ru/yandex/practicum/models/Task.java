@@ -1,20 +1,29 @@
+package ru.yandex.practicum.models;
+
 public class Task {
     protected String name;
     protected String description;
     protected int uniqueID;
     protected String status;
-    protected boolean isDone;
 
-    public Task(String name, String description, int uniqueID, String status, boolean isDone) {
+    public Task(String name, String description, int uniqueID, String status) {
         this.name = name;
         this.description = description;
         this.uniqueID = uniqueID;
         this.status = status;
-        this.isDone = isDone;
 
-        if (status.equals("DONE")){
-            this.isDone = true;
-        }
+    }
+
+    public int getUniqueID() {
+        return uniqueID;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
@@ -23,8 +32,6 @@ public class Task {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", uniqueID=" + uniqueID +
-                ", status='" + status + '\'' +
-                ", isDone=" + isDone +
-                '}';
+                ", status='" + status + '\'' + '}';
     }
 }

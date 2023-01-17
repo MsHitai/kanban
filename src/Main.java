@@ -1,3 +1,7 @@
+import ru.yandex.practicum.models.Epic;
+import ru.yandex.practicum.models.SubTask;
+import ru.yandex.practicum.models.Task;
+import ru.yandex.practicum.service.Manager;
 
 public class Main {
     public static void main(String[] args) {
@@ -5,22 +9,22 @@ public class Main {
         Manager manager = new Manager();
 
         Task task1 = new Task("Покормить кота", "В 14-00", manager.createID(),
-                "NEW", false);
+                "NEW");
         Task task2 = new Task("Погулять с хомяком", "Три раза", manager.createID(),
-                "NEW", false);
+                "NEW");
 
         Epic epic1 = new Epic("Переехать", "До понедельника", manager.createID(),
-                "NEW", false);
+                "NEW");
         SubTask subTask1 = new SubTask("Упаковать кота", "Не забыть его корм!", manager.createID(),
-                "NEW", false, epic1.uniqueID);
+                "NEW", epic1.getUniqueID());
         SubTask subTask2 = new SubTask("Попрощаться со всеми", "Не забыть соседей!", manager.createID(),
-                "NEW", false, epic1.uniqueID);
+                "NEW", epic1.getUniqueID());
 
 
         Epic epic2 = new Epic("Построить дом", "Из бревен", manager.createID(),
-                "NEW", false);
+                "NEW");
         SubTask subTask3 = new SubTask("Заказать бревна", "Нужны черные!", manager.createID(),
-                "NEW", false, epic2.uniqueID);
+                "NEW", epic2.getUniqueID());
 
         System.out.println("Создаем задачи...");
         manager.createTask(task1);
@@ -28,64 +32,69 @@ public class Main {
         manager.createEpic(epic1);
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
-        manager.sortSubTasksByEpics(epic1, epic1.uniqueID);
+        manager.sortSubTasksByEpics(epic1, epic1.getUniqueID());
         manager.createEpic(epic2);
         manager.createSubTask(subTask3);
-        manager.sortSubTasksByEpics(epic2, epic2.uniqueID);
+        manager.sortSubTasksByEpics(epic2, epic2.getUniqueID());
 
         System.out.println("У нас создались следующие задачи: ");
-        manager.listAllTasks();
-        manager.listAllEpics();
-        manager.listAllSubTasks();
+        System.out.println(manager.getTasks());
+        System.out.println(manager.getSubTasks());
+        System.out.println(manager.getEpics());
 
-        System.out.println("Находим задачу под номером 2");
-        manager.getAnyTaskByID(manager.tasks, 2);
+        System.out.println("Находим задачу под номером 1");
+        System.out.println(manager.getTask(task1.getUniqueID()));
 
         System.out.println("Обновляем задачу под номером 1 на статус 'выполнено'. Проверяем...");
-        manager.refreshTask("Покормить кота", "В 14-00", task1.uniqueID, "DONE",
-                false);
-        manager.getAnyTaskByID(manager.tasks, 1);
+        manager.refreshTask("Покормить кота", "В 14-00", task1.getUniqueID(), "DONE");
+        System.out.println(manager.getTask(task1.getUniqueID()));
 
         System.out.println("Удаляем задачу под номером: 1. Остаётся в списке задач:");
-        manager.deleteTaskByID(manager.tasks, 1);
-        manager.listAllTasks();
+        manager.deleteTask(task1.getUniqueID());
+        System.out.println(manager.getTasks());
 
         System.out.println("Удаляем список задач, проверяем...");
-        manager.deleteAllTasks(manager.tasks);
-        manager.listAllTasks();
+        manager.deleteAllTasks();
+        System.out.println(manager.getTasks());
 
         System.out.println("Получаем список всех подзадач первого эпика...");
-        manager.getSubTasksByEpics(epic1);
+        System.out.println(manager.getSubTasksByEpics(epic1));
 
         System.out.println("Меняем статус подзадачи 'Упаковать кота' на 'в процессе'. Проверяем: ");
-        manager.refreshSubTask("Упаковать кота", "Не забыть его корм!", subTask1.uniqueID,
-                "IN_PROGRESS", false, epic1.uniqueID);
-        manager.getAnyTaskByID(manager.subTasks, subTask1.uniqueID);
+        manager.refreshSubTask("Упаковать кота", "Не забыть его корм!", subTask1.getUniqueID(),
+                "IN_PROGRESS", epic1.getUniqueID());
+        System.out.println(manager.getSubtask(subTask1.getUniqueID()));
 
         System.out.println("Проверяем статус первого эпика: ");
-        System.out.println(epic1.checkStatus());
+        System.out.println(manager.getEpic(epic1.getUniqueID()));
 
         System.out.println("Попробуем поменять статус первого эпика вручную на 'выполнен'. Проверяем:");
-        manager.refreshEpic("Переехать", "До понедельника", epic1.uniqueID,
-                "DONE", true);
-        manager.getAnyTaskByID(manager.epics, epic1.uniqueID);
+        manager.refreshEpic("Переехать", "До понедельника", epic1.getUniqueID(),
+                "DONE");
+        System.out.println(manager.getEpic(epic1.getUniqueID()));
+
+        System.out.println("Удаляем подзадачу со статусом 'в процессе' у первого эпика и проверяем его статус: ");
+        manager.deleteSubTask(subTask1.getUniqueID());
+        System.out.println(manager.getEpic(epic1.getUniqueID()));
 
         System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'. Проверяем: ");
-        manager.refreshSubTask("Заказать бревна", "Нужны черные!", subTask3.uniqueID,
-                "DONE", false, epic2.uniqueID);
-        manager.getSubTasksByEpics(epic2);
+        manager.refreshSubTask("Заказать бревна", "Нужны черные!", subTask3.getUniqueID(),
+                "DONE", epic2.getUniqueID());
+        System.out.println(manager.getSubTasksByEpics(epic2));
 
         System.out.println("Проверяем выполнен ли второй эпик...");
-        System.out.println(epic2.checkIsDone());
+        System.out.println(manager.getEpic(epic2.getUniqueID()));
 
-        System.out.println("Удаляем второй эпик. Проверяем его по ID и смотрим список его подзадач: ");
-        manager.deleteEpicByID(manager.epics, epic2.uniqueID);
-        manager.getAnyTaskByID(manager.epics, epic2.uniqueID);
-        manager.getSubTasksByEpics(epic2);
+        System.out.println("Удаляем второй эпик. Проверяем его по ID, смотрим список его подзадач и " +
+                "проверяем весь список подзадач: ");
+        manager.deleteEpic(epic2.getUniqueID());
+        System.out.println(manager.getEpic(epic2.getUniqueID()));
+        System.out.println(manager.getSubTasksByEpics(epic2));
+        System.out.println(manager.getSubTasks());
 
-        System.out.println("Удаляем все эпики. Проверяем: ");
+        System.out.println("Удаляем все эпики. Проверяем список эпиков и их подзадач: ");
         manager.deleteAllEpics();
-        manager.listAllEpics();
-        manager.listAllSubTasks();
+        System.out.println(manager.getEpics());
+        System.out.println(manager.getSubTasks());
     }
 }
