@@ -195,7 +195,7 @@ public class Manager {
             }
         }
         if (!subtasks.isEmpty()) {
-            epic.fillMySubTasks(subtasks);
+            epic.setSubtaskIds(subtasks);
         }
     }
 

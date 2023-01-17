@@ -10,11 +10,12 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getSubtaskIds() {
+
         return subtaskIds;
     }
 
-    public void fillMySubTasks(ArrayList<Integer> subtasks) {
-        subtaskIds = subtasks;
+    public void setSubtaskIds(ArrayList<Integer> subtaskIds) {
+        this.subtaskIds = subtaskIds;
     }
 
     @Override
