@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class Manager {
     int uniqueID;
 
-    HashMap<Integer, Task> tasks = new HashMap<>();
-    HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HashMap<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
 
     public HashMap<Integer, Task> getTasks() {
         return tasks;
@@ -106,7 +106,7 @@ public class Manager {
     public void deleteAllSubTasks() {
         if (subTasks != null) {
             subTasks.clear();
-            if(epics != null) {
+            if (epics != null) {
                 for (Epic epic : epics.values()) {
                     updateEpicStatus(epic);
                 }
@@ -124,7 +124,7 @@ public class Manager {
         }
     }
 
-    private void updateEpicStatus(Epic epic){
+    private void updateEpicStatus(Epic epic) {
         sortSubTasksByEpics(epic, epic.getUniqueID()); // обновляем список подзадач у эпика
         if ((epic.getSubtaskIds() == null) || epic.getSubtaskIds().isEmpty()) {
             epic.setStatus("NEW");
@@ -133,15 +133,15 @@ public class Manager {
         }
     }
 
-    private void checkSubtaskStatus(Epic epic){
+    private void checkSubtaskStatus(Epic epic) {
         if (!getSubTasksByEpics(epic).isEmpty()) {
             int newSum = getSubTasksByEpics(epic).size();
             int doneSum = getSubTasksByEpics(epic).size();
             for (SubTask subTask : getSubTasksByEpics(epic)) {
-                if(subTask == null) {
+                if (subTask == null) {
                     continue;
                 }
-                if (subTask.getStatus().equals("NEW")){
+                if (subTask.getStatus().equals("NEW")) {
                     newSum--;
                 } else if (subTask.getStatus().equals("DONE")) {
                     doneSum--;
