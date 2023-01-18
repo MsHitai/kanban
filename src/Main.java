@@ -75,7 +75,7 @@ public class Main {
         Epic epic = new Epic("Переехать", "До понедельника", epic1.getUniqueID(),
                 "DONE");
         manager.updateEpic(epic);
-        System.out.println(manager.getEpic(epic1.getUniqueID()));
+        System.out.println(manager.getEpic(epic.getUniqueID()));
 
         System.out.println("Удаляем подзадачу со статусом 'в процессе' у первого эпика и проверяем его статус: ");
         manager.deleteSubTask(subTask1.getUniqueID());

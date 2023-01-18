@@ -153,9 +153,11 @@ public class Manager {
     public void updateEpic(Epic epic) {
         int epicID = epic.getUniqueID();
         if (epics.containsKey(epicID)) {
+            epics.remove(epicID);
+            epics.put(epicID, epic);
             sortSubTasksByEpics(epic, epicID);
             updateEpicStatus(getEpic(epicID));
-            epics.put(epicID, getEpic(epicID));
+
         }
     }
 
