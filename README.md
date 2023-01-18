@@ -1,2 +1,2 @@
-# java-kanban
-Repository for homework project.
+# Трекер Задач
+Это репозиторий финального задания 3-го спринта.
