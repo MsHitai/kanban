@@ -49,7 +49,6 @@ public class Manager {
     public void updateTask(Task task) {
         int id = task.getUniqueID();
         if (tasks.containsKey(id)) {
-            tasks.remove(id);
             tasks.put(id, task);
         }
     }
@@ -79,24 +78,19 @@ public class Manager {
     public void updateSubTask(SubTask subTask) {
         int id = subTask.getUniqueID();
         int epicId = subTask.getEpicId();
-        if (subtasks.containsKey(id)) {
-            subtasks.remove(id);
+        if (subtasks.containsKey(id) && epics.containsKey(epicId)) {
             subtasks.put(id, subTask);
-        }
-        if (epics.containsKey(epicId)) {
-            sortSubTasksByEpics(getEpic(epicId), epicId);
             updateEpicStatus(getEpic(epicId));
         }
     }
 
     public void deleteAllSubTasks() {
         subtasks.clear();
-        if (epics != null) {
-            for (Epic epic : epics.values()) {
-                epic.getSubtaskIds().clear();
-                updateEpicStatus(epic);
-            }
+        for (Epic epic : epics.values()) {
+            epic.getSubtaskIds().clear();
+            updateEpicStatus(epic);
         }
+
     }
 
     public void deleteSubTask(int id) {
@@ -106,14 +100,8 @@ public class Manager {
                 return;
             }
             Epic epic = epics.get(subTask.getEpicId());
+            epic.removeSubtaskId(id);
             updateEpicStatus(epic);
-            ArrayList<Integer> tasks = epic.getSubtaskIds();
-            for (int i = 0; i < tasks.size(); i++) {
-                if(tasks.get(i) == id) {
-                    tasks.remove(i);
-                    break;
-                }
-            }
         }
     }
 
@@ -153,9 +141,7 @@ public class Manager {
     public void updateEpic(Epic epic) {
         int epicID = epic.getUniqueID();
         if (epics.containsKey(epicID)) {
-            epics.remove(epicID);
             epics.put(epicID, epic);
-            sortSubTasksByEpics(epic, epicID);
             updateEpicStatus(getEpic(epicID));
 
         }
@@ -163,10 +149,10 @@ public class Manager {
 
     public void deleteEpic(int id) {
         if (epics.containsKey(id)) {
-            ArrayList<Integer> tasks = getEpic(id).getSubtaskIds();
+            ArrayList<Integer> tasksId = getEpic(id).getSubtaskIds();
             if (tasks != null) {
-                for (int i = 0; i < tasks.size(); i++) {
-                    deleteSubTask(tasks.get(i));
+                for (Integer subtaskId : tasksId) {
+                    subtasks.remove(subtaskId);
                 }
                 epics.remove(id);
             }

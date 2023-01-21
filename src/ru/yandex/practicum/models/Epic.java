@@ -15,7 +15,17 @@ public class Epic extends Task {
     }
 
     public void setSubtaskIds(ArrayList<Integer> subtaskIds) {
+
         this.subtaskIds = subtaskIds;
+    }
+
+    public void removeSubtaskId(int id) {
+        for (int i = 0; i < subtaskIds.size(); i++) {
+            if (subtaskIds.get(i) == id) { // оставляю цикл, так как subtaskIds.remove(id) дает ошибку IndexOutOfBounds
+                subtaskIds.remove(i);      // подробности в Пачке
+                break;
+            }
+        }
     }
 
     @Override
