@@ -32,10 +32,8 @@ public class Main {
         manager.createEpic(epic1);
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
-        manager.sortSubTasksByEpics(epic1, epic1.getUniqueID());
         manager.createEpic(epic2);
         manager.createSubTask(subTask3);
-        manager.sortSubTasksByEpics(epic2, epic2.getUniqueID());
 
         System.out.println("У нас создались следующие задачи: ");
         System.out.println(manager.getTasks());

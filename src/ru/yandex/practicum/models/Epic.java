@@ -3,7 +3,7 @@ package ru.yandex.practicum.models;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subtaskIds;
+    private ArrayList<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(String name, String description, int uniqueID, String status) {
         super(name, description, uniqueID, status);
@@ -19,13 +19,14 @@ public class Epic extends Task {
         this.subtaskIds = subtaskIds;
     }
 
-    public void removeSubtaskId(int id) {
-        for (int i = 0; i < subtaskIds.size(); i++) {
-            if (subtaskIds.get(i) == id) { // оставляю цикл, так как subtaskIds.remove(id) дает ошибку IndexOutOfBounds
-                subtaskIds.remove(i);      // подробности в Пачке
-                break;
-            }
+    public void addSubtaskId(int id) {
+        if(!subtaskIds.contains(id)) {
+            subtaskIds.add(id);
         }
+    }
+
+    public void removeSubtaskId(int id) {
+        subtaskIds.remove(Integer.valueOf(id));
     }
 
     @Override
