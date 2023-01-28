@@ -56,6 +56,11 @@ public class Main {
         Managers.getDefault().deleteAllTasks();
         System.out.println(Managers.getDefault().getTasks());
 
+        System.out.println(); // добавила строчку, чтобы выделить историю запросов
+
+        System.out.println("История запросов: ");
+        System.out.println(Managers.getDefaultHistory().getHistory());
+
         System.out.println("Получаем список всех подзадач первого эпика...");
         System.out.println(Managers.getDefault().getSubTasksByEpics(epic1));
 
@@ -78,6 +83,11 @@ public class Main {
         Managers.getDefault().deleteSubTask(subTask1.getUniqueID());
         System.out.println(Managers.getDefault().getEpic(epic1.getUniqueID()));
         System.out.println(Managers.getDefault().getSubtasks());
+
+        System.out.println(); // добавила строчку, чтобы выделить историю запросов
+
+        System.out.println("История запросов: ");
+        System.out.println(Managers.getDefaultHistory().getHistory());
 
         System.out.println("Обновляем статус для подзадачи второго эпика на 'выполнен'. Проверяем: ");
         SubTask subTask5 = new SubTask("Заказать бревна", "Нужны черные!", subTask3.getUniqueID(),
