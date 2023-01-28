@@ -16,19 +16,19 @@ public class InMemoryTaskManager implements TaskManager{
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subtasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
-
+    @Override
     public List<Task> getTasks() {
         return new ArrayList<>(this.tasks.values());
     }
-
+    @Override
     public List<SubTask> getSubtasks() {
         return new ArrayList<>(this.subtasks.values());
     }
-
+    @Override
     public List<Epic> getEpics() {
         return new ArrayList<>(this.epics.values());
     }
-
+    @Override
     public int createID() {
         return ++uniqueID;
     }
@@ -57,14 +57,17 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public Task getTask(int id) {
+        Managers.getDefaultHistory().add(tasks.get(id));
         return tasks.get(id);
     }
     @Override
     public SubTask getSubtask(int id) {
+        Managers.getDefaultHistory().add(subtasks.get(id));
         return subtasks.get(id);
     }
     @Override
     public Epic getEpic(int id) {
+        Managers.getDefaultHistory().add(epics.get(id));
         return epics.get(id);
     }
     @Override
@@ -165,7 +168,7 @@ public class InMemoryTaskManager implements TaskManager{
         epics.clear();
         subtasks.clear();
     }
-
+    @Override
     public ArrayList<SubTask> getSubTasksByEpics(Epic epic) {
         ArrayList<SubTask> tasks = new ArrayList<>();
         for (int id : epic.getSubtaskIds()) {
