@@ -9,7 +9,7 @@ public class SubTask extends Task {
         return epicId;
     }
 
-    public SubTask(String name, String description, int uniqueID, String status, int epicId) {
+    public SubTask(String name, String description, int uniqueID, Status status, int epicId) {
         super(name, description, uniqueID, status);
         this.epicId = epicId;
     }

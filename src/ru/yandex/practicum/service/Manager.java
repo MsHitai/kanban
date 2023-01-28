@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 import ru.yandex.practicum.models.Epic;
+import ru.yandex.practicum.models.Status;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 
@@ -108,7 +109,7 @@ public class Manager {
 
     private void updateEpicStatus(Epic epic) {
         if ((epic.getSubtaskIds() == null) || epic.getSubtaskIds().isEmpty()) {
-            epic.setStatus("NEW");
+            epic.setStatus(Status.NEW);
         } else {
             checkSubtaskStatus(epic);
         }
@@ -122,18 +123,18 @@ public class Manager {
                 if (subTask == null) {
                     continue;
                 }
-                if (subTask.getStatus().equals("NEW")) {
+                if (subTask.getStatus().equals(Status.NEW)) {
                     newSum--;
-                } else if (subTask.getStatus().equals("DONE")) {
+                } else if (subTask.getStatus().equals(Status.DONE)) {
                     doneSum--;
                 }
             }
             if (newSum == 0) {
-                epic.setStatus("NEW");
+                epic.setStatus(Status.NEW);
             } else if (doneSum == 0) {
-                epic.setStatus("DONE");
+                epic.setStatus(Status.DONE);
             } else {
-                epic.setStatus("IN_PROGRESS");
+                epic.setStatus(Status.IN_PROGRESS);
             }
         }
     }
