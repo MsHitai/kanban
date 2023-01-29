@@ -11,34 +11,37 @@ import java.util.List;
 
 
 public class InMemoryTaskManager implements TaskManager{
-    int uniqueID;
+    private int uniqueId = 0;
+    // можешь, пожалуйста, подсказать почему createID() должен быть private и не должен быть в интерфейсе?
+    private final HistoryManager<Task> historyManager = Managers.getDefaultHistory();
 
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subtasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
     @Override
     public List<Task> getTasks() {
+
         return new ArrayList<>(this.tasks.values());
     }
     @Override
     public List<SubTask> getSubtasks() {
+
         return new ArrayList<>(this.subtasks.values());
     }
     @Override
     public List<Epic> getEpics() {
+
         return new ArrayList<>(this.epics.values());
-    }
-    @Override
-    public int createID() {
-        return ++uniqueID;
     }
 
     @Override
     public void createTask(Task task) {
+        task.setUniqueID(++uniqueId); // нужно ли оставлять createID() если это по сути инкремент приват переменной?
         tasks.put(task.getUniqueID(), task);
     }
     @Override
     public void createSubTask(SubTask subTask) {
+        subTask.setUniqueID(++uniqueId);
         subtasks.put(subTask.getUniqueID(), subTask);
         Epic epic = getEpic(subTask.getEpicId());
         epic.addSubtaskId(subTask.getUniqueID());
@@ -46,6 +49,7 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void createEpic(Epic epic) {
+        epic.setUniqueID(++uniqueId);
         epics.put(epic.getUniqueID(), epic);
     }
     @Override
@@ -57,27 +61,29 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public Task getTask(int id) {
-        Managers.getDefaultHistory().add(tasks.get(id));
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
     @Override
     public SubTask getSubtask(int id) {
-        Managers.getDefaultHistory().add(subtasks.get(id));
+        historyManager.add(subtasks.get(id));
         return subtasks.get(id);
     }
     @Override
     public Epic getEpic(int id) {
-        Managers.getDefaultHistory().add(epics.get(id));
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
     @Override
     public void deleteTask(int id) {
-        if (tasks.containsKey(id)) {
+        if (tasks.containsKey(id)) { // почему идея ругается, что это лишняя проверка, ведь выйдет ошибка,
+                                    // если просто будет tasks.remove(id), а нужной id нет в списке, или нет?
             tasks.remove(id);
         }
     }
     @Override
     public void deleteAllTasks() {
+
         tasks.clear();
     }
     @Override
@@ -177,4 +183,8 @@ public class InMemoryTaskManager implements TaskManager{
         return tasks;
     }
 
+    @Override
+    public void getHistory(){
+        System.out.println(historyManager.getHistory());
+    }
 }

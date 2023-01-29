@@ -22,6 +22,11 @@ public class Task {
         return status;
     }
 
+    public void setUniqueID(int uniqueID) {
+
+        this.uniqueID = uniqueID;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
