@@ -39,16 +39,8 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         private Node tail;
         private final Map<Integer, Node> sortingTasks = new HashMap<>();
 
-        private void addFirst(T task) {
-            Node node = new Node(task);
-            node.next = head;
-            node.prev = null;
-            if (head != null) {
-                head.prev = node;
-            }
-            head = node;
-            sortingTasks.put(task.getUniqueID(), head);
-            size++;
+        public CustomLinkedList() {
+            size = 0;
         }
 
         public List<T> getTasks() {
@@ -64,61 +56,42 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         public void linkLast(T task) {
             Node node = new Node(task);
             node.next = null;
-            node.prev = tail;
-            if (tail == null) {
-                addFirst(task);
-                return;
+
+            if (size == 0) {
+                this.head = node;
+                this.tail = node;
+            } else {
+                node.prev = tail;
+                tail.next = node;
+                tail = node;
             }
-            tail.next = node;
-            tail = node;
-            sortingTasks.put(task.getUniqueID(), tail);
+            sortingTasks.put(task.getUniqueID(), node);
             size++;
         }
 
-        private void removeFirst() {
-            removeNodefromMap(head);
-            head = head.next;
-            if (head == null) {
-                tail = null;
-            }
-            size--;
-        }
-
-        private void removeLast() {
-            if (size <= 1) {
-                removeFirst();
-                return;
-            }
-            tail = tail.prev;
-            tail.next = null;
-            removeNodefromMap(tail);
-            size--;
-        }
-
         public Node getNode(int id) {
-            for (Map.Entry<Integer, Node> entry : sortingTasks.entrySet()) {
-                int taskId = entry.getKey();
-                Node node = entry.getValue();
-                if (id == taskId) {
-                    return node;
-                }
-            }
-            return null;
+            return sortingTasks.getOrDefault(id, null);
         }
 
         public void removeNode(Node node) {
             if (node == null) {
+                removeNodefromMap(node);
                 return;
             }
-            if (node == head) {
-                removeFirst();
-                return;
+            if (size == 1) {
+                head = null;
+                tail = null;
+            } else if (node == head) {
+                head = head.next;
+                head.prev = null;
             } else if (node == tail) {
-                removeLast();
-                return;
+                tail = tail.prev;
+                tail.next = null;
+            } else {
+                Node before = node.prev;
+                before.next = before.next.next;
+                before.next.prev = before;
             }
-            Node node1 = node.prev;
-            node1.next = node.next;
             removeNodefromMap(node);
             size--;
         }
