@@ -53,7 +53,7 @@ public class Main {
         taskManager.deleteAllTasks();
         System.out.println(taskManager.getTasks());
 
-        System.out.println(); // добавила строчку, чтобы выделить историю запросов
+        System.out.println();
 
         System.out.println("История запросов: ");
         taskManager.getHistory();
@@ -80,7 +80,7 @@ public class Main {
         System.out.println(taskManager.getEpic(epic1.getUniqueID()));
         System.out.println(taskManager.getSubtasks());
 
-        System.out.println(); // добавила строчку, чтобы выделить историю запросов
+        System.out.println();
 
         System.out.println("История запросов: ");
         taskManager.getHistory();

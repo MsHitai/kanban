@@ -12,12 +12,15 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager{
     private int uniqueId = 0;
-    // можешь, пожалуйста, подсказать почему createID() должен быть private и не должен быть в интерфейсе?
     private final HistoryManager<Task> historyManager = Managers.getDefaultHistory();
 
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, SubTask> subtasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epics = new HashMap<>();
+
+    private int createID() {
+        return ++uniqueId;
+    }
     @Override
     public List<Task> getTasks() {
 
@@ -36,12 +39,12 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void createTask(Task task) {
-        task.setUniqueID(++uniqueId); // нужно ли оставлять createID() если это по сути инкремент приват переменной?
+        task.setUniqueID(createID()); // поняла, спасибо, верну метод
         tasks.put(task.getUniqueID(), task);
     }
     @Override
     public void createSubTask(SubTask subTask) {
-        subTask.setUniqueID(++uniqueId);
+        subTask.setUniqueID(createID());
         subtasks.put(subTask.getUniqueID(), subTask);
         Epic epic = getEpic(subTask.getEpicId());
         epic.addSubtaskId(subTask.getUniqueID());
@@ -49,7 +52,7 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void createEpic(Epic epic) {
-        epic.setUniqueID(++uniqueId);
+        epic.setUniqueID(createID());
         epics.put(epic.getUniqueID(), epic);
     }
     @Override
@@ -76,10 +79,8 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void deleteTask(int id) {
-        if (tasks.containsKey(id)) { // почему идея ругается, что это лишняя проверка, ведь выйдет ошибка,
-                                    // если просто будет tasks.remove(id), а нужной id нет в списке, или нет?
-            tasks.remove(id);
-        }
+        historyManager.remove(id);
+        tasks.remove(id);
     }
     @Override
     public void deleteAllTasks() {
@@ -107,6 +108,7 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public void deleteSubTask(int id) {
         if (subtasks.containsKey(id)) {
+            historyManager.remove(id);
             SubTask subTask = subtasks.remove(id);
             if (subTask == null) {
                 return;
@@ -160,9 +162,11 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public void deleteEpic(int id) {
         if (epics.containsKey(id)) {
+            historyManager.remove(id);
             ArrayList<Integer> tasksId = getEpic(id).getSubtaskIds();
             if (tasks != null) {
                 for (Integer subtaskId : tasksId) {
+                    historyManager.remove(id);
                     subtasks.remove(subtaskId);
                 }
                 epics.remove(id);
