@@ -9,12 +9,15 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
 
     CustomLinkedList<T> historyTasks = new CustomLinkedList<>();
 
+    protected static Map<Integer, Node> sortingTasks = new HashMap<>(); // как раз сомневалась, где она более логична
+                                                                        // и уместна:)))
+
     @Override
     public void add(T task) {
         if (task == null) {
             return;
         }
-        if (historyTasks.sortingTasks.containsKey(task.getUniqueID())) {
+        if (sortingTasks.containsKey(task.getUniqueID())) {
             remove(task.getUniqueID());
         }
         historyTasks.linkLast(task);
@@ -37,7 +40,6 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         private int size;
         private Node head;
         private Node tail;
-        private final Map<Integer, Node> sortingTasks = new HashMap<>();
 
         public CustomLinkedList() {
             size = 0;

@@ -39,7 +39,7 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void createTask(Task task) {
-        task.setUniqueID(createID()); // поняла, спасибо, верну метод
+        task.setUniqueID(createID());
         tasks.put(task.getUniqueID(), task);
     }
     @Override
@@ -84,7 +84,9 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void deleteAllTasks() {
-
+        for (Integer id : tasks.keySet()) {
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
     @Override
@@ -98,6 +100,9 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void deleteAllSubTasks() {
+        for (Integer id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
@@ -175,7 +180,13 @@ public class InMemoryTaskManager implements TaskManager{
     }
     @Override
     public void deleteAllEpics() {
+        for (Integer id : epics.keySet()) {
+            historyManager.remove(id);
+        }
         epics.clear();
+        for (Integer id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         subtasks.clear();
     }
     @Override

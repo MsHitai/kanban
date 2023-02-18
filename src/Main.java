@@ -71,7 +71,18 @@ public class Main {
 
         System.out.println();
 
-        System.out.println("Удаляем задачу \"Покормить кота\". Проверяем осталась ли она в истории:");
+        System.out.println("Удаляем все подзадачи, проверяем историю запросов:");
+        taskManager.deleteAllSubTasks();
+        taskManager.getHistory();
+
+        System.out.println();
+
+        System.out.println("Удаляем все задачи и эпики, проверяем историю запросов:");
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllEpics();
+        taskManager.getHistory();
+
+        /*System.out.println("Удаляем задачу \"Покормить кота\". Проверяем осталась ли она в истории:");
         taskManager.deleteTask(task1.getUniqueID());
         taskManager.getHistory();
 
@@ -79,6 +90,6 @@ public class Main {
 
         System.out.println("Удаляем эпик \"Переехать\". Проверяем историю: ");
         taskManager.deleteEpic(epic1.getUniqueID());
-        taskManager.getHistory();
+        taskManager.getHistory();*/
     }
 }
