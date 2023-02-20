@@ -7,13 +7,12 @@ import java.util.*;
 public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T> {
 
 
-    CustomLinkedList<T> historyTasks = new CustomLinkedList<>();
+    CustomLinkedList<Task> historyTasks = new CustomLinkedList<>();
 
-    protected static Map<Integer, Node> sortingTasks = new HashMap<>(); // как раз сомневалась, где она более логична
-                                                                        // и уместна:)))
+    protected static Map<Integer, Node<Task>> sortingTasks = new HashMap<>();
 
     @Override
-    public void add(T task) {
+    public void add(Task task) {
         if (task == null) {
             return;
         }
@@ -21,43 +20,44 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
             remove(task.getUniqueID());
         }
         historyTasks.linkLast(task);
+        sortingTasks.put(task.getUniqueID(), historyTasks.tail);
     }
 
     @Override
     public void remove(int id) {
-        Node node = historyTasks.getNode(id);
+        Node<Task> node = sortingTasks.getOrDefault(id, null);
         historyTasks.removeNode(node);
+        sortingTasks.remove(id);
     }
 
 
     @Override
-    public List<T> getHistory() {
+    public List<Task> getHistory() {
 
         return historyTasks.getTasks();
     }
 
     private static class CustomLinkedList<T extends Task> {
         private int size;
-        private Node head;
-        private Node tail;
+        private Node<T> head;
+        private Node<T> tail;
 
         public CustomLinkedList() {
             size = 0;
         }
 
-        public List<T> getTasks() {
-            List<T> history = new ArrayList<>();
-            Node node = head;
+        public List<Task> getTasks() {
+            List<Task> history = new ArrayList<>();
+            Node<T> node = head;
             for (int i = 0; i < size; i++) {
-                history.add((T) node.task);
+                history.add(node.task);
                 node = node.next;
             }
             return history;
         }
 
         public void linkLast(T task) {
-            Node node = new Node(task);
-            node.next = null;
+            Node<T> node = new Node<>(null, task, null);
 
             if (size == 0) {
                 this.head = node;
@@ -67,17 +67,11 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
                 tail.next = node;
                 tail = node;
             }
-            sortingTasks.put(task.getUniqueID(), node);
             size++;
         }
 
-        public Node getNode(int id) {
-            return sortingTasks.getOrDefault(id, null);
-        }
-
-        public void removeNode(Node node) {
+        public void removeNode(Node<T> node) {
             if (node == null) {
-                removeNodefromMap(node);
                 return;
             }
             if (size == 1) {
@@ -90,24 +84,11 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
                 tail = tail.prev;
                 tail.next = null;
             } else {
-                Node before = node.prev;
+                Node<T> before = node.prev;
                 before.next = before.next.next;
                 before.next.prev = before;
             }
-            removeNodefromMap(node);
             size--;
-        }
-
-        private void removeNodefromMap(Node node) {
-            for (Map.Entry<Integer, Node> entry : sortingTasks.entrySet()) {
-                int taskId = entry.getKey();
-                Node node1 = entry.getValue();
-                if (node1 == node) {
-                    sortingTasks.remove(taskId);
-                    return;
-                }
-            }
-
         }
     }
 }
