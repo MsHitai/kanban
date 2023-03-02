@@ -1,8 +1,6 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.models.Task;
-
-public class Node<T extends Task> {
+public class Node<T> {
     T task;
     Node<T> next;
     Node<T> prev;

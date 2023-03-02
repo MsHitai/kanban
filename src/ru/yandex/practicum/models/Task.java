@@ -1,5 +1,7 @@
 package ru.yandex.practicum.models;
 
+import ru.yandex.practicum.enums.Status;
+
 public class Task {
     protected String name;
     protected String description;

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.service;
 
 import ru.yandex.practicum.models.Epic;
-import ru.yandex.practicum.models.Status;
+import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 

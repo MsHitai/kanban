@@ -1,5 +1,5 @@
 import ru.yandex.practicum.models.Epic;
-import ru.yandex.practicum.models.Status;
+import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 import ru.yandex.practicum.service.Managers;
@@ -17,11 +17,11 @@ public class Main {
 
         Epic epic1 = new Epic("Переехать", "До понедельника", 0, Status.NEW);
         taskManager.createEpic(epic1);
-        SubTask subTask1 = new SubTask("Упаковать кота", "Не забыть его корм!", 0, Status.NEW,
+        SubTask subTask1 = new SubTask("Упаковать кота", "Не забыть его корм!", 0, Status.DONE,
                 epic1.getUniqueID());
         taskManager.createSubTask(subTask1);
         SubTask subTask2 = new SubTask("Попрощаться со всеми", "Не забыть соседей!", 0,
-                Status.NEW, epic1.getUniqueID());
+                Status.DONE, epic1.getUniqueID());
         taskManager.createSubTask(subTask2);
         SubTask subTask3 = new SubTask("Нанять грузчиков", "Минимум четырех", 0, Status.NEW,
                 epic1.getUniqueID());

@@ -1,5 +1,7 @@
 package ru.yandex.practicum.models;
 
+import ru.yandex.practicum.enums.Status;
+
 import java.util.Objects;
 
 public class SubTask extends Task {

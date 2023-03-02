@@ -37,7 +37,7 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         return historyTasks.getTasks();
     }
 
-    private static class CustomLinkedList<T extends Task> {
+    private static class CustomLinkedList<T> {
         private int size;
         private Node<T> head;
         private Node<T> tail;
@@ -50,7 +50,7 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
             List<Task> history = new ArrayList<>();
             Node<T> node = head;
             for (int i = 0; i < size; i++) {
-                history.add(node.task);
+                history.add((Task) node.task);
                 node = node.next;
             }
             return history;
