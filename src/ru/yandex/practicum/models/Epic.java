@@ -1,6 +1,7 @@
 package ru.yandex.practicum.models;
 
 import ru.yandex.practicum.enums.Status;
+import ru.yandex.practicum.enums.Tasks;
 
 import java.util.ArrayList;
 
@@ -9,6 +10,7 @@ public class Epic extends Task {
 
     public Epic(String name, String description, int uniqueID, Status status) {
         super(name, description, uniqueID, status);
+        this.type = Tasks.EPIC;
     }
 
     public ArrayList<Integer> getSubtaskIds() {
@@ -33,16 +35,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        String result = "Epic{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", uniqueID=" + uniqueID +
-                ", status='" + status + '\'';
-        if (subtaskIds != null) {
-            result = result + ", subtaskIds=" + subtaskIds.size() + '}';
-        } else {
-            result = result + ", subtaskIds=null" + '}';
-        }
-        return result;
+        return uniqueID + "," + type + "," +
+                name + "," + status + "," + description + "," +  "\n";
     }
 }

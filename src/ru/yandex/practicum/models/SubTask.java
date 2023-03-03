@@ -1,6 +1,7 @@
 package ru.yandex.practicum.models;
 
 import ru.yandex.practicum.enums.Status;
+import ru.yandex.practicum.enums.Tasks;
 
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class SubTask extends Task {
     public SubTask(String name, String description, int uniqueID, Status status, int epicId) {
         super(name, description, uniqueID, status);
         this.epicId = epicId;
+        this.type = Tasks.SUBTASK;
     }
 
     @Override
@@ -34,11 +36,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
-                "epicId=" + epicId +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", uniqueID=" + uniqueID +
-                ", status='" + status + '\'' + '}';
+        return uniqueID + "," + type + "," +
+                name + "," + status + "," + description + "," + epicId + "\n";
     }
 }
