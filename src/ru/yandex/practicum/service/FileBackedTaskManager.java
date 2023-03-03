@@ -49,33 +49,47 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        int index = tasksToLoadFrom.size() - 1;
-        InMemoryHistoryManager.historyFromString(tasksToLoadFrom.get(index));
 
         return new FileBackedTaskManager(file.toString());
     }
 
     private void loadTasks(List<String> tasks) { // можно разбить загрузку на 2 действия? не могу сделать этот метод статическим
         // чтобы можно было вызвать в статическом методе, т.к. переменные у тасок не статические, или есть какой-то вариант?
+        int index = tasksToLoadFrom.size() - 1;
+        List<Integer> loadedHistory = InMemoryHistoryManager.historyFromString(tasksToLoadFrom.get(index));
+
         for (int i = 1; i < tasks.size() - 1; i++) {
             String[] types = tasks.get(i).split(","); // делим каждую строку на массивы из слов
             if (!tasks.get(i).isBlank() || !tasks.get(i).isEmpty()) {
-            Tasks type = Tasks.valueOf(types[1]);
-            switch (type) {
-                case TASK:
-                    super.createTask(fromString(tasks.get(i)));
-                    break;
-                case EPIC:
-                    super.createEpic((Epic) fromString(tasks.get(i)));
-                    break;
-                case SUBTASK:
-                    super.createSubTask((SubTask) fromString(tasks.get(i)));
-                    break;
+                Tasks type = Tasks.valueOf(types[1]);
+                switch (type) {
+                    case TASK:
+                        Task task = fromString(tasks.get(i));
+                        super.createTask(task);
+                        if (loadedHistory.contains(task.getUniqueID())) {
+                            super.getTask(task.getUniqueID());
+                        }
+                        break;
+                    case EPIC:
+                        Epic epic = (Epic) fromString(tasks.get(i));
+                        super.createEpic(epic);
+                        if (loadedHistory.contains(epic.getUniqueID())) {
+                            super.getEpic(epic.getUniqueID());
+                        }
+                        break;
+                    case SUBTASK:
+                        SubTask subTask = (SubTask) fromString(tasks.get(i));
+                        super.createSubTask(subTask);
+                        if (loadedHistory.contains(subTask.getUniqueID())) {
+                            super.getSubtask(subTask.getUniqueID());
+                        }
+                        break;
+                }
             }
         }
-    }
 
-}
+
+    }
 
     private Task fromString(String value) {
         int id;
@@ -254,7 +268,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public Epic getEpic(int id) { // вызов этого метода в createSubtask обновляет историю из файла
+    public Epic getEpic(int id) {
         super.getEpic(id);
         try {
             save();
