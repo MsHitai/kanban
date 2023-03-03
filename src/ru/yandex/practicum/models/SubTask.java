@@ -37,6 +37,6 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         return uniqueID + "," + type + "," +
-                name + "," + status + "," + description + "," + epicId + "\n";
+                name + "," + status + "," + description + "," + epicId + "," + "\n";
     }
 }

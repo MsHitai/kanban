@@ -43,13 +43,14 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
             sb.append(id);
             sb.append(",");
         }
-        return sb.toString();
+        return sb.toString(); // зачем передавать параметр historyManager, если historyToString принадлежит классу?
+        // Если брать id даже не из sortingTasks, которые тоже принадлежат классу, мы же не можем взять не статичный
+        // список в статичном методе, верно?
     }
 
     public static List<Integer> historyFromString (String value) {
         List<Integer> list = new ArrayList<>();
-        String[] allInfo = value.split("\r\n");
-        String[] ids = allInfo[allInfo.length-1].split(",");
+        String[] ids = value.split(",");
         for (String i : ids) {
             list.add(Integer.parseInt(i));
         }

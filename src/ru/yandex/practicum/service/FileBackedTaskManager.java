@@ -1,17 +1,20 @@
 package ru.yandex.practicum.service;
 
 import ru.yandex.practicum.enums.Status;
+import ru.yandex.practicum.enums.Tasks;
 import ru.yandex.practicum.exceptions.ManagerSaveException;
 import ru.yandex.practicum.models.Epic;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
     private final String path;
+    private static List<String> tasksToLoadFrom = new ArrayList<>();
 
     public FileBackedTaskManager(String path) {
         super();
@@ -34,7 +37,71 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
+    public static FileBackedTaskManager loadFromFile(File file) throws FileNotFoundException {
 
+        try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
+            while (br.ready()) {
+                String line = br.readLine();
+                tasksToLoadFrom.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int index = tasksToLoadFrom.size() - 1;
+        InMemoryHistoryManager.historyFromString(tasksToLoadFrom.get(index));
+
+        return new FileBackedTaskManager(file.toString());
+    }
+
+    private void loadTasks(List<String> tasks) { // можно разбить загрузку на 2 действия? не могу сделать этот метод статическим
+        // чтобы можно было вызвать в статическом методе, т.к. переменные у тасок не статические, или есть какой-то вариант?
+        for (int i = 1; i < tasks.size() - 1; i++) {
+            String[] types = tasks.get(i).split(","); // делим каждую строку на массивы из слов
+            if (!tasks.get(i).isBlank() || !tasks.get(i).isEmpty()) {
+            Tasks type = Tasks.valueOf(types[1]);
+            switch (type) {
+                case TASK:
+                    super.createTask(fromString(tasks.get(i)));
+                    break;
+                case EPIC:
+                    super.createEpic((Epic) fromString(tasks.get(i)));
+                    break;
+                case SUBTASK:
+                    super.createSubTask((SubTask) fromString(tasks.get(i)));
+                    break;
+            }
+        }
+    }
+
+}
+
+    private Task fromString(String value) {
+        int id;
+        Tasks type;
+        String name;
+        Status status;
+        String description;
+
+        String[] fields = value.split(",");
+        id = Integer.parseInt(fields[0]);
+        type = Tasks.valueOf(fields[1]);
+        name = fields[2];
+        status = Status.valueOf(fields[3]);
+        description = fields[4];
+
+        switch (type) {
+            case TASK:
+                return new Task(name, description, id, status);
+            case SUBTASK:
+                return new SubTask(name, description, id, status, Integer.parseInt(fields[5]));
+            case EPIC:
+                return new Epic(name, description, id, status);
+        }
+
+        return null;
+    }
 
     private String separateTasksFromLists(List<?> list) { //достаем задачи из списка по строкам, чтобы не было [] в save
         StringBuilder sb = new StringBuilder();
@@ -165,7 +232,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id) { // переопределяем эти методы, чтобы сохранять историю, когда обращаемся к задачам
         super.getTask(id);
         try {
             save();
@@ -187,7 +254,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Epic getEpic(int id) { // вызов этого метода в createSubtask обновляет историю из файла
         super.getEpic(id);
         try {
             save();
@@ -198,20 +265,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
 
-    public static void main(String[] args) {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
+    public static void main(String[] args) throws FileNotFoundException {
+        // 1 сценарий:
+        /*FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
+        fileBackedTaskManager.createTask(new Task("sample", "just for fun", 0, Status.NEW));
         fileBackedTaskManager.createEpic(new Epic("sample2", "just for fun2", 0, Status.NEW));
         fileBackedTaskManager.createSubTask(new SubTask("sample3", "just for fun3", 0,
-                Status.NEW, 1));
-        fileBackedTaskManager.createTask(new Task("sample", "just for fun", 0, Status.NEW));
+                Status.NEW, 2));
+        fileBackedTaskManager.updateSubTask(new SubTask("sample3", "just for fun3", 3,
+                Status.DONE, 2));
 
-        fileBackedTaskManager.updateSubTask(new SubTask("sample3", "just for fun3", 2,
-                Status.DONE, 1));
+        fileBackedTaskManager.getTask(1);*/
 
-        fileBackedTaskManager.getTask(3);
+        // 2 сценарий:
+        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
+                File("resources/save.csv"));
+        fileBackedTaskManager.loadTasks(tasksToLoadFrom);
 
+        System.out.println(fileBackedTaskManager.getTasks());
+        System.out.println(fileBackedTaskManager.getEpics());
+        System.out.println(fileBackedTaskManager.getSubtasks());
 
-        //fileBackedTaskManager.deleteSubTask(2);
+        fileBackedTaskManager.getHistory();
 
     }
 }

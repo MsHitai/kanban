@@ -38,16 +38,6 @@ public class Task {
         this.status = status;
     }
 
-    public Task fromString (String value) {
-        String[] fields = value.split(",");
-        uniqueID = Integer.parseInt(fields[0]);
-        type = Tasks.valueOf(fields[1]);
-        name = fields[2];
-        status = Status.valueOf(fields[3]);
-        description = fields[4];
-        return new Task(name, description, uniqueID, status);
-    }
-
     @Override
     public String toString() {
         return uniqueID + "," + type + "," +
