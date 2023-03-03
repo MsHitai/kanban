@@ -1,5 +1,6 @@
 id,type,name,status,description,epic 
-[3,TASK,sample,NEW,just for fun,
-][1,EPIC,sample2,NEW,just for fun2,
-][2,SUBTASK,sample3,NEW,just for fun3,1
-]
+3,TASK,sample,NEW,just for fun,
+1,EPIC,sample2,DONE,just for fun2,
+2,SUBTASK,sample3,DONE,just for fun3,1
+
+1,3,

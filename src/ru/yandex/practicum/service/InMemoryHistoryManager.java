@@ -37,6 +37,26 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         return historyTasks.getTasks();
     }
 
+    public static String historyToString(HistoryManager<Task> historyManager) {
+        StringBuilder sb = new StringBuilder();
+        for (Integer id : sortingTasks.keySet()) {
+            sb.append(id);
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    public static List<Integer> historyFromString (String value) {
+        List<Integer> list = new ArrayList<>();
+        String[] allInfo = value.split("\r\n");
+        String[] ids = allInfo[allInfo.length-1].split(",");
+        for (String i : ids) {
+            list.add(Integer.parseInt(i));
+        }
+
+        return list;
+    }
+
     private static class CustomLinkedList<T> {
         private int size;
         private Node<T> head;
