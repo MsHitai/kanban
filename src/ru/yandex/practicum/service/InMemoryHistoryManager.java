@@ -37,27 +37,6 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         return historyTasks.getTasks();
     }
 
-    public static String historyToString(HistoryManager<Task> historyManager) {
-        StringBuilder sb = new StringBuilder();
-        for (Integer id : sortingTasks.keySet()) {
-            sb.append(id);
-            sb.append(",");
-        }
-        return sb.toString(); // зачем передавать параметр historyManager, если historyToString принадлежит классу?
-        // Если брать id даже не из sortingTasks, которые тоже принадлежат классу, мы же не можем взять не статичный
-        // список в статичном методе, верно?
-    }
-
-    public static List<Integer> historyFromString (String value) {
-        List<Integer> list = new ArrayList<>();
-        String[] ids = value.split(",");
-        for (String i : ids) {
-            list.add(Integer.parseInt(i));
-        }
-
-        return list;
-    }
-
     private static class CustomLinkedList<T> {
         private int size;
         private Node<T> head;

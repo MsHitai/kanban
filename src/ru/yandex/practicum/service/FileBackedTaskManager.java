@@ -14,7 +14,6 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
     private final String path;
-    private static List<String> tasksToLoadFrom = new ArrayList<>();
 
     public FileBackedTaskManager(String path) {
         super();
@@ -28,7 +27,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             bw.write(separateTasksFromLists(super.getEpics()));
             bw.write(separateTasksFromLists(super.getSubtasks()));
             bw.write("\n");
-            bw.write(InMemoryHistoryManager.historyToString(super.getHistoryManager()));
+            bw.write(historyToString(super.getHistoryManager()));
 
         } catch (ManagerSaveException e) {
             throw new ManagerSaveException("Ошибка сохранения файла.");
@@ -38,77 +37,84 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public static FileBackedTaskManager loadFromFile(File file) throws FileNotFoundException {
-
+        final FileBackedTaskManager taskManager = new FileBackedTaskManager(file.toString());
         try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
-            while (br.ready()) {
-                String line = br.readLine();
-                tasksToLoadFrom.add(line);
+            String line = null;
+            while (!(line = br.readLine()).isBlank()) {
+
+                if (!line.contains("id,type")) {
+                    String[] types = line.split(",");
+                    Tasks type = Tasks.valueOf(types[1]);
+                    switch (type) {
+                        case TASK:
+                            Task task = fromString(line);
+                            taskManager.tasks.put(task.getUniqueID(), task);
+                            break;
+                        case EPIC:
+                            Epic epic = (Epic) fromString(line);
+                            taskManager.epics.put(epic.getUniqueID(), epic);
+                            break;
+                        case SUBTASK:
+                            SubTask subTask = (SubTask) fromString(line);
+                            taskManager.subtasks.put(subTask.getUniqueID(), subTask);
+                            break;
+                    }
+                }
             }
+            if (br.ready()) {
+                line = br.readLine();
+                List<Integer> loadedHistory = historyFromString(line);
+                for (Integer id : loadedHistory) {
+                    if (taskManager.tasks.containsKey(id)) {
+                        taskManager.getTask(id);
+                    } else if (taskManager.epics.containsKey(id)) {
+                        taskManager.getEpic(id);
+                    } else if (taskManager.subtasks.containsKey(id)) {
+                        taskManager.getSubtask(id);
+                    }
+                }
+            }
+
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException(e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return new FileBackedTaskManager(file.toString());
+        return taskManager;
     }
 
-    private void loadTasks(List<String> tasks) { // можно разбить загрузку на 2 действия? не могу сделать этот метод статическим
-        // чтобы можно было вызвать в статическом методе, т.к. переменные у тасок не статические, или есть какой-то вариант?
-        int index = tasksToLoadFrom.size() - 1;
-        List<Integer> loadedHistory = InMemoryHistoryManager.historyFromString(tasksToLoadFrom.get(index));
+    private static String historyToString(HistoryManager<Task> historyManager) {
+        StringBuilder sb = new StringBuilder();
+        for (Task task : historyManager.getHistory()) {
+            sb.append(task.getUniqueID());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
 
-        for (int i = 1; i < tasks.size() - 1; i++) {
-            String[] types = tasks.get(i).split(","); // делим каждую строку на массивы из слов
-            if (!tasks.get(i).isBlank() || !tasks.get(i).isEmpty()) {
-                Tasks type = Tasks.valueOf(types[1]);
-                switch (type) {
-                    case TASK:
-                        Task task = fromString(tasks.get(i));
-                        super.createTask(task);
-                        if (loadedHistory.contains(task.getUniqueID())) {
-                            super.getTask(task.getUniqueID());
-                        }
-                        break;
-                    case EPIC:
-                        Epic epic = (Epic) fromString(tasks.get(i));
-                        super.createEpic(epic);
-                        if (loadedHistory.contains(epic.getUniqueID())) {
-                            super.getEpic(epic.getUniqueID());
-                        }
-                        break;
-                    case SUBTASK:
-                        SubTask subTask = (SubTask) fromString(tasks.get(i));
-                        super.createSubTask(subTask);
-                        if (loadedHistory.contains(subTask.getUniqueID())) {
-                            super.getSubtask(subTask.getUniqueID());
-                        }
-                        break;
-                }
-            }
+    private static List<Integer> historyFromString (String value) {
+        List<Integer> list = new ArrayList<>();
+        String[] ids = value.split(",");
+        for (String i : ids) {
+            list.add(Integer.parseInt(i));
         }
 
-
+        return list;
     }
 
-    private Task fromString(String value) {
-        int id;
-        Tasks type;
-        String name;
-        Status status;
-        String description;
-
+    private static Task fromString(String value) {
         String[] fields = value.split(",");
-        id = Integer.parseInt(fields[0]);
-        type = Tasks.valueOf(fields[1]);
-        name = fields[2];
-        status = Status.valueOf(fields[3]);
-        description = fields[4];
+        int id = Integer.parseInt(fields[0]);
+        Tasks type = Tasks.valueOf(fields[1]);
+        String name = fields[2];
+        Status status = Status.valueOf(fields[3]);
+        String description = fields[4];
 
         switch (type) {
             case TASK:
                 return new Task(name, description, id, status);
-            case SUBTASK:
+            case SUBTASK: // только у сабтаски есть значение по 5 индексу - epicId
                 return new SubTask(name, description, id, status, Integer.parseInt(fields[5]));
             case EPIC:
                 return new Epic(name, description, id, status);
@@ -128,153 +134,93 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     @Override
     public void createTask(Task task) {
         super.createTask(task);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void createSubTask(SubTask subTask) {
         super.createSubTask(subTask);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void createEpic(Epic epic) {
         super.createEpic(epic);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void updateTask(Task task) {
         super.updateTask(task);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void updateSubTask(SubTask subTask) {
         super.updateSubTask(subTask);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void updateEpic(Epic epic) {
         super.updateEpic(epic);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteTask(int id) {
         super.deleteTask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteAllTasks() {
         super.deleteAllTasks();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteSubTask(int id) {
         super.deleteSubTask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteAllSubTasks() {
         super.deleteAllSubTasks();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteEpic(int id) {
         super.deleteEpic(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public void deleteAllEpics() {
         super.deleteAllEpics();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
     }
 
     @Override
     public Task getTask(int id) { // переопределяем эти методы, чтобы сохранять историю, когда обращаемся к задачам
         super.getTask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
         return super.getTask(id);
     }
 
     @Override
     public SubTask getSubtask(int id) {
         super.getSubtask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
         return super.getSubtask(id);
     }
 
     @Override
     public Epic getEpic(int id) {
         super.getEpic(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            throw new RuntimeException(e);
-        }
+        save();
         return super.getEpic(id);
     }
 
@@ -294,7 +240,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         // 2 сценарий:
         FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
                 File("resources/save.csv"));
-        fileBackedTaskManager.loadTasks(tasksToLoadFrom);
+
 
         System.out.println(fileBackedTaskManager.getTasks());
         System.out.println(fileBackedTaskManager.getEpics());
