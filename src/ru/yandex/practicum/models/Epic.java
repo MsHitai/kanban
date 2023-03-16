@@ -3,10 +3,17 @@ package ru.yandex.practicum.models;
 import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.enums.Tasks;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds = new ArrayList<>();
+
+    private LocalDateTime endTime;
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
 
     public Epic(String name, String description, int uniqueID, Status status) {
         super(name, description, uniqueID, status);

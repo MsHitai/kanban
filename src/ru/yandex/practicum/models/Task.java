@@ -5,6 +5,7 @@ import ru.yandex.practicum.enums.Tasks;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static ru.yandex.practicum.enums.Tasks.TASK;
 
@@ -61,9 +62,31 @@ public class Task {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return uniqueID == task.uniqueID && duration == task.duration
+                && Objects.equals(name, task.name)
+                && Objects.equals(description, task.description)
+                && status == task.status && type == task.type
+                && startTime.equals(task.startTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, uniqueID, status, type, duration, startTime);
+    }
+
+    @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
-        String formattedTaskDate = startTime.format(formatter);
+        String formattedTaskDate;
+        if (startTime == null) { // чтобы не делать parse от null
+            formattedTaskDate = null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+            formattedTaskDate = startTime.format(formatter);
+        }
         return uniqueID + "," + type + "," +
                 name + "," + status + "," + description + "," + formattedTaskDate + "," + duration + "\n";
     }

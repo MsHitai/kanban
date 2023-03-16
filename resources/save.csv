@@ -1,6 +1,8 @@
 id,type,name,status,description,startTime,duration,epic 
 1,TASK,sample,NEW,just for fun,16-03-23 11:04,15
-2,EPIC,sample2,DONE,just for fun2,
-3,SUBTASK,sample3,DONE,just for fun3,2,
+2,EPIC,sample2,NEW,just for fun2,
+3,SUBTASK,sample3,NEW,just for fun3,16-03-23 14:02,15,2,
+4,SUBTASK,epic2's second subtask,NEW,needed for date testing,16-03-23 14:20,15,2,
+5,SUBTASK,epic2's third subtask,NEW,needed for time conflicts testing,16-03-23 14:07,15,2,
 
 2,1,
