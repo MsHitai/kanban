@@ -1,5 +1,5 @@
-id,type,name,status,description,epic 
-1,TASK,sample,NEW,just for fun,
+id,type,name,status,description,startTime,duration,epic 
+1,TASK,sample,NEW,just for fun,16-03-23 11:04,15
 2,EPIC,sample2,DONE,just for fun2,
 3,SUBTASK,sample3,DONE,just for fun3,2,
 
