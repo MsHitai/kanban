@@ -21,14 +21,11 @@ public class InMemoryTaskManager implements TaskManager{
     protected final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    protected Comparator<Task> taskComparator = new Comparator<Task>() {
-        @Override
-        public int compare(Task o1, Task o2) { // todo make some kind of null sorting thing...
+    protected Comparator<Task> taskComparator = (o1, o2) -> { // todo make some kind of null sorting thing...
             if (o1.getStartTime() == null || o2.getStartTime() == null) {
                 return 0;
             }
             return o1.getStartTime().compareTo(o2.getStartTime());
-        }
     };
 
     protected final Set<Task> prioritizedTasks = new TreeSet<>(taskComparator);
@@ -56,7 +53,9 @@ public class InMemoryTaskManager implements TaskManager{
     public void createTask(Task task) {
         task.setUniqueID(createID());
         tasks.put(task.getUniqueID(), task);
-        prioritizedTasks.add(task);
+        if (checkTimeClashes(task)) {
+            prioritizedTasks.add(task);
+        }
     }
     @Override
     public void createSubTask(SubTask subTask) {
@@ -65,20 +64,24 @@ public class InMemoryTaskManager implements TaskManager{
         Epic epic = getEpic(subTask.getEpicId());
         epic.addSubtaskId(subTask.getUniqueID());
         updateEpicStatus(epic);
-        prioritizedTasks.add(subTask);
+        updateEpicTime(epic);
+        if (checkTimeClashes(subTask)) {
+            prioritizedTasks.add(subTask);
+        }
     }
     @Override
     public void createEpic(Epic epic) {
         epic.setUniqueID(createID());
         epics.put(epic.getUniqueID(), epic);
-        prioritizedTasks.add(epic);
     }
     @Override
     public void updateTask(Task task) {
         int id = task.getUniqueID();
         if (tasks.containsKey(id)) {
             tasks.put(id, task);
-            prioritizedTasks.add(task);
+            if (checkTimeClashes(task)) {
+                prioritizedTasks.add(task);
+            }
         }
     }
     @Override
@@ -119,6 +122,10 @@ public class InMemoryTaskManager implements TaskManager{
         if (subtasks.containsKey(id) && epics.containsKey(epicId)) {
             subtasks.put(id, subTask);
             updateEpicStatus(getEpic(epicId));
+            updateEpicTime(getEpic(epicId));
+            if (checkTimeClashes(subTask)) {
+                prioritizedTasks.add(subTask);
+            }
         }
     }
     @Override
@@ -132,6 +139,7 @@ public class InMemoryTaskManager implements TaskManager{
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
             updateEpicStatus(epic);
+            updateEpicTime(epic);
         }
 
     }
@@ -147,6 +155,7 @@ public class InMemoryTaskManager implements TaskManager{
             Epic epic = epics.get(subTask.getEpicId());
             epic.removeSubtaskId(id);
             updateEpicStatus(epic);
+            updateEpicTime(epic);
         }
     }
 
@@ -181,6 +190,58 @@ public class InMemoryTaskManager implements TaskManager{
             }
         }
     }
+
+    private boolean checkTimeClashes (Task task) { // проверяем пересечения времени
+        if (task == null) {
+            return true;
+        }
+        ArrayList<Task> prioritized = new ArrayList<>(prioritizedTasks);
+        boolean noClashes = true;
+        if (prioritized.size() == 0) {
+            return true;
+        }
+        for (Task task1 : prioritized) {
+            if (task.equals(task1)) {
+                continue;
+            }
+            /* пусть первая задача 14:02 // endTime 14:17
+               а вторая 14:07          // endTime 14:22
+               значит 14:07 is After 14:02 && Before 14:17*/
+            if (task.getStartTime().isAfter(task1.getStartTime()) && task.getStartTime().isBefore(task1.getEndTime())) {
+                noClashes = false;
+            }
+        }
+        return noClashes;
+    }
+
+    private void updateEpicTime(Epic epic) {
+        if (epic.getSubtaskIds() == null || epic.getSubtaskIds().isEmpty()) {
+            epic.setStartTime(null);
+            epic.setDuration(0);
+            epic.setEndTime(null);
+        } else {
+            checkEpicStartTimeAndDuration(epic);
+        }
+    }
+
+    private void checkEpicStartTimeAndDuration(Epic epic) {
+        SubTask subTask = getSubtask(epic.getSubtaskIds().get(0)); // берем подзадачу по первому индексу эпика
+        LocalDateTime minStartTime = subTask.getStartTime(); // и задаем минимум для начального времени
+        int duration = 0;
+        for (Integer subtaskId : epic.getSubtaskIds()) {
+            subTask = getSubtask(subtaskId);
+            if (subTask.getStartTime().isBefore(minStartTime)) {
+                minStartTime = subTask.getStartTime();
+            }
+
+            duration += subTask.getDuration(); // todo maybe find maxTime and duration is start minus endTime?
+        }
+
+        epic.setStartTime(minStartTime);
+        epic.setDuration(duration);
+        epic.setEndTime(minStartTime.plusMinutes(duration));
+    }
+
     @Override
     public void updateEpic(Epic epic) {
         int epicID = epic.getUniqueID();
@@ -188,13 +249,12 @@ public class InMemoryTaskManager implements TaskManager{
             epic.setSubtaskIds(getEpic(epic.getUniqueID()).getSubtaskIds());
             epics.put(epicID, epic);
             updateEpicStatus(getEpic(epicID));
+            updateEpicTime(getEpic(epicID));
         }
     }
     @Override
     public void deleteEpic(int id) {
         if (epics.containsKey(id)) {
-            Epic epic = getEpic(id);
-            prioritizedTasks.remove(epic);
             ArrayList<Integer> tasksId = getEpic(id).getSubtaskIds();
             if (tasksId != null) {
                 for (Integer subtaskId : tasksId) {
@@ -209,8 +269,6 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public void deleteAllEpics() {
         for (Integer id : epics.keySet()) {
-            Epic epic = getEpic(id);
-            prioritizedTasks.remove(epic);
             historyManager.remove(id);
         }
         epics.clear();

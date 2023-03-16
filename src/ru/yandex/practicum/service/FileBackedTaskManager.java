@@ -128,14 +128,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     switch (type) {
                         case TASK:
                             Task task = fromString(line);
+                            if (task == null) {
+                                break;
+                            }
                             taskManager.tasks.put(task.getUniqueID(), task);
-                            break;
+                            break; // Патимат, если мы напрямую кладем в мапу, после загрузки если создадим задачу,
+                        // id сгенерируется 1 и затрет эту задачу, может поменять все-таки на createTask(task)?
                         case EPIC:
                             Epic epic = (Epic) fromString(line);
+                            if (epic == null) {
+                                break;
+                            }
                             taskManager.epics.put(epic.getUniqueID(), epic);
                             break;
                         case SUBTASK:
                             SubTask subTask = (SubTask) fromString(line);
+                            if (subTask == null) {
+                                break;
+                            }
                             taskManager.subtasks.put(subTask.getUniqueID(), subTask);
                             break;
                     }
@@ -189,7 +199,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return sb.toString();
     }
 
-    private static List<Integer> historyFromString (String value) {
+    private static List<Integer> historyFromString(String value) {
         List<Integer> list = new ArrayList<>();
         String[] ids = value.split(",");
         for (String i : ids) {
@@ -206,31 +216,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = fields[2];
         Status status = Status.valueOf(fields[3]);
         String description = fields[4];
-
+        LocalDateTime startTime;
+        LocalDateTime endTime;
+        if (fields[5].equals("null")) {
+            startTime = null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+            startTime = LocalDateTime.parse(fields[5], formatter);
+        }
+        int duration = Integer.parseInt(fields[6]); // todo after add for subtask move this above?
 
         switch (type) {
             case TASK:
-                LocalDateTime startTime;
-                if (fields[5].equals("null")) {
-                    startTime = null;
-                } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
-                    startTime = LocalDateTime.parse(fields[5], formatter);
-                }
-                int duration = Integer.parseInt(fields[6]); // todo after add for subtask move this above?
                 return new Task(name, description, id, status, duration, startTime);
             case SUBTASK:
-                if (fields[5].equals("null")) {
-                    startTime = null;
-                } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
-                    startTime = LocalDateTime.parse(fields[5], formatter);
-                }
-                duration = Integer.parseInt(fields[6]); // todo after add for subtask move this above?
                 int epicId = Integer.parseInt(fields[8]);
                 return new SubTask(name, description, id, status, duration, startTime, epicId);
             case EPIC:
-                return new Epic(name, description, id, status);
+                if (fields[7].equals("null")) {
+                    endTime = null;
+                } else {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+                    endTime = LocalDateTime.parse(fields[7], formatter);
+                }
+                return new Epic(name, description, id, status, duration, startTime, endTime);
         }
 
         return null;

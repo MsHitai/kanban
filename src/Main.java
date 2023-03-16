@@ -40,11 +40,20 @@ public class Main {
         System.out.println("Сортировка по приоритету: ");
         System.out.println(taskManager.getPrioritizedTasks());
 
+        System.out.println("История");
+        taskManager.getHistory();
+
         System.out.println("Удалим подзадачу под номером 4");
         taskManager.deleteSubTask(4);
 
+        System.out.println("История");
+        taskManager.getHistory();
+
         System.out.println("Сортировка по приоритету: ");
         System.out.println(taskManager.getPrioritizedTasks());
+
+        System.out.println("История");
+        taskManager.getHistory();
 
         System.out.println("Удалим все подзадачи.. ");
         taskManager.deleteAllSubTasks();

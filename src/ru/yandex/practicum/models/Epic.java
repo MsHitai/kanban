@@ -4,6 +4,7 @@ import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.enums.Tasks;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -16,6 +17,11 @@ public class Epic extends Task {
         this.endTime = endTime;
     }
 
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
@@ -26,6 +32,13 @@ public class Epic extends Task {
 
     public Epic(String name, String description, int uniqueID, Status status) {
         super(name, description, uniqueID, status);
+        this.type = Tasks.EPIC;
+    }
+
+    public Epic(String name, String description, int uniqueID, Status status, int duration, LocalDateTime startTime,
+                LocalDateTime endTime) {
+        super(name, description, uniqueID, status, duration, startTime);
+        this.endTime = endTime;
         this.type = Tasks.EPIC;
     }
 
@@ -70,7 +83,18 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+        String formattedTaskDate = null;
+        String formattedEndTime = null;
+        if (startTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+            formattedTaskDate = startTime.format(formatter);
+        }
+        if (endTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+            formattedEndTime = getEndTime().format(formatter);
+        }
         return uniqueID + "," + type + "," +
-                name + "," + status + "," + description + "," +  "\n";
+                name + "," + status + "," + description + "," + formattedTaskDate + "," + getDuration() + "," +
+                formattedEndTime +  "\n";
     }
 }
