@@ -246,7 +246,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public static void main(String[] args) throws FileNotFoundException {
         // 1 сценарий:
-        /*FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
         fileBackedTaskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 11, 4)));
 
@@ -262,11 +262,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 "needed for time conflicts testing", 0, Status.NEW, 15,
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 7), 2));
 
-        fileBackedTaskManager.getTask(1);*/
+        fileBackedTaskManager.getTask(1);
 
         // 2 сценарий:
-        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
-                File("resources/save.csv"));
+        /*FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
+                File("resources/save.csv"));*/
 
 
         System.out.println(fileBackedTaskManager.getTasks());

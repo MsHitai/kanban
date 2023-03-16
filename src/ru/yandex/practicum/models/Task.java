@@ -47,7 +47,7 @@ public class Task {
         this.type = TASK;
     }
 
-    public LocalDateTime getEndTime() { // todo каждый вызов этого метода прибавляет 15 минут к старту?
+    public LocalDateTime getEndTime() {
         return startTime.plusMinutes(duration);
     }
 

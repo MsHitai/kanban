@@ -6,6 +6,7 @@ import ru.yandex.practicum.models.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
 
@@ -48,4 +49,6 @@ public interface TaskManager {
     void deleteAllEpics();
 
     void getHistory();
+
+    Set<Task> getPrioritizedTasks();
 }
