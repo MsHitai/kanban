@@ -166,7 +166,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private void save() throws ManagerSaveException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.path, false))) {
-            bw.write("id,type,name,status,description,startTime,duration,epic \n");
+            bw.write("id,type,name,status,description,startTime,duration,endTime,epic \n");
             bw.write(separateTasksFromLists(super.getTasks()));
             bw.write(separateTasksFromLists(super.getEpics()));
             bw.write(separateTasksFromLists(super.getSubtasks()));
@@ -227,7 +227,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     startTime = LocalDateTime.parse(fields[5], formatter);
                 }
                 duration = Integer.parseInt(fields[6]); // todo after add for subtask move this above?
-                int epicId = Integer.parseInt(fields[7]);
+                int epicId = Integer.parseInt(fields[8]);
                 return new SubTask(name, description, id, status, duration, startTime, epicId);
             case EPIC:
                 return new Epic(name, description, id, status);
@@ -246,27 +246,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public static void main(String[] args) throws FileNotFoundException {
         // 1 сценарий:
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
-        fileBackedTaskManager.createTask(new Task("sample", "just for fun", 0, Status.NEW,
+        /*FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
+        fileBackedTaskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 11, 4)));
 
-        fileBackedTaskManager.createEpic(new Epic("sample2", "just for fun2", 0, Status.NEW));
-        fileBackedTaskManager.createSubTask(new SubTask("sample3", "just for fun3", 0,
-                Status.NEW, 15, LocalDateTime.of(2023, Month.MARCH, 16, 14, 2),
+        fileBackedTaskManager.createEpic(new Epic("epic epic", "got three subtasks", 0, Status.NEW));
+        fileBackedTaskManager.createSubTask(new SubTask("first subtask", "am I the startTime?", 0,
+                Status.IN_PROGRESS, 15, LocalDateTime.of(2023, Month.MARCH, 16, 14, 2),
                 2));
-        fileBackedTaskManager.createSubTask(new SubTask("epic2's second subtask",
+        fileBackedTaskManager.createSubTask(new SubTask("second subtask",
                 "needed for date testing", 0, Status.NEW, 15,
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 20), 2));
 
-        fileBackedTaskManager.createSubTask(new SubTask("epic2's third subtask",
+        fileBackedTaskManager.createSubTask(new SubTask("third subtask",
                 "needed for time conflicts testing", 0, Status.NEW, 15,
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 7), 2));
 
-        fileBackedTaskManager.getTask(1);
+        fileBackedTaskManager.getTask(1);*/
 
         // 2 сценарий:
-        /*FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
-                File("resources/save.csv"));*/
+        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
+                File("resources/save.csv"));
 
 
         System.out.println(fileBackedTaskManager.getTasks());

@@ -20,6 +20,14 @@ public class Task {
     protected int duration; // число в минутах
     LocalDateTime startTime;
 
+    public int getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
     public Task(String name, String description, int uniqueID, Status status, int duration,
                 LocalDateTime startTime) {
         this.name = name;
@@ -39,9 +47,8 @@ public class Task {
         this.type = TASK;
     }
 
-    public LocalDateTime getEndTime() {
-        startTime = startTime.plusMinutes(duration);
-        return startTime;
+    public LocalDateTime getEndTime() { // todo каждый вызов этого метода прибавляет 15 минут к старту?
+        return startTime.plusMinutes(duration);
     }
 
     public int getUniqueID() {
@@ -81,13 +88,17 @@ public class Task {
     @Override
     public String toString() {
         String formattedTaskDate;
+        String formattedEndTime;
         if (startTime == null) { // чтобы не делать parse от null
             formattedTaskDate = null;
+            formattedEndTime = null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
             formattedTaskDate = startTime.format(formatter);
+            formattedEndTime = getEndTime().format(formatter);
         }
         return uniqueID + "," + type + "," +
-                name + "," + status + "," + description + "," + formattedTaskDate + "," + duration + "\n";
+                name + "," + status + "," + description + "," + formattedTaskDate + "," + duration + "," +
+                formattedEndTime + "\n";
     }
 }

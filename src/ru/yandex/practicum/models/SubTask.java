@@ -50,14 +50,17 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         String formattedTaskDate;
+        String formattedEndTime;
         if (startTime == null) { // чтобы не делать parse от null
             formattedTaskDate = null;
+            formattedEndTime = null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
             formattedTaskDate = startTime.format(formatter);
+            formattedEndTime = getEndTime().format(formatter);
         }
         return uniqueID + "," + type + "," +
                 name + "," + status + "," + description + "," + formattedTaskDate + "," + duration + "," +
-                epicId + "," + "\n";
+                formattedEndTime + "," + epicId + "\n";
     }
 }
