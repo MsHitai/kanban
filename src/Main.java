@@ -20,14 +20,14 @@ public class Main {
 
         taskManager.createEpic(new Epic("epic epic", "got three subtasks", 0, Status.NEW));
         taskManager.createSubTask(new SubTask("first subtask", "am I the startTime?", 0,
-                Status.IN_PROGRESS, 15, LocalDateTime.of(2023, Month.MARCH, 16, 14, 2),
+                Status.NEW, 15, LocalDateTime.of(2023, Month.MARCH, 16, 14, 2),
                 2));
         taskManager.createSubTask(new SubTask("second subtask",
                 "needed for date testing", 0, Status.NEW, 15,
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 20), 2));
 
         taskManager.createSubTask(new SubTask("third subtask",
-                "needed for time conflicts testing", 0, Status.NEW, 15,
+                "needed for time conflicts testing", 0, Status.DONE, 15,
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 7), 2));
 
         System.out.println("Создаем задачи...");
