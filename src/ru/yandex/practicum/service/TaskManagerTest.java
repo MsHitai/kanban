@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.enums.Status;
@@ -81,6 +82,8 @@ class TaskManagerTest<T extends TaskManager> {
         assertEquals(subtask, prioritized.get(0), "Задачи не совпадают.");
     }
 
+    // todo проверить prioritized tasks на пересечения
+
     @Test
     public void shouldUpdateTaskStatus() { // должно быть возможным обновлять статус у задачи
         Task task1 = new Task("testTask", "testDescription", task.getUniqueID(), Status.DONE, 15,
@@ -89,6 +92,9 @@ class TaskManagerTest<T extends TaskManager> {
         Task task2 = TASK_MANAGER.getTask(task1.getUniqueID());
 
         assertEquals(Status.DONE, task2.getStatus(), "Статус не совпадает");
+
+        task1.setStatus(Status.NEW);
+        TASK_MANAGER.updateTask(task1); // возвращаем статус на NEW, чтобы не было пересечений статусов с др.тестами
     }
 
     @Test
@@ -100,6 +106,9 @@ class TaskManagerTest<T extends TaskManager> {
         SubTask subTask2 = TASK_MANAGER.getSubtask(subTask1.getUniqueID());
 
         assertEquals(Status.IN_PROGRESS, subTask2.getStatus(), "Статус не совпадает");
+
+        subTask1.setStatus(Status.NEW);
+        TASK_MANAGER.updateSubTask(subTask1); // возвращаем статус на NEW, чтобы не было пересечений статусов с др.тестами
     }
 
     @Test
@@ -123,11 +132,143 @@ class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(Status.IN_PROGRESS, epic1.getStatus(), "Статус не совпадает");
 
-        TASK_MANAGER.deleteSubTask(subTask1.getUniqueID());
+        TASK_MANAGER.deleteSubTask(subTask1.getUniqueID()); // удаляем подзадачу, проверяем вернулся ли статус эпика
+
+        assertEquals(Status.NEW, epic1.getStatus(), "Статус не совпадает");
+    }
+
+    @Test
+    public void shouldNotUpdateTaskWithWrongId () { // не должно обновлять задачу с неправильным id
+        Task task1 = new Task("testTask", "testDescription", 0, Status.IN_PROGRESS, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 15, 4));
+        TASK_MANAGER.updateTask(task1);
+
+        assertNotEquals(Status.IN_PROGRESS, task.getStatus(), "Статусы совпадают.");
+    }
+
+    @Test
+    public void shouldNotUpdateSubtaskWithWrongId () { // не должно обновлять подзадачу с неправильным id
+        SubTask subTask1 = new SubTask("testSubtask", "testDescription", 0, Status.NEW, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 14, 2), 2);
+        TASK_MANAGER.updateSubTask(subTask1);
+
+        assertNotEquals(Status.IN_PROGRESS, subtask.getStatus(), "Статусы совпадают.");
+    }
+
+    @Test
+    public void shouldNotUpdateEpicWithWrongId () { // не должно обновлять эпик с неправильным id
+        Epic epic1 = new Epic("changeName", "testDescription", 0, Status.DONE);
+        TASK_MANAGER.updateEpic(epic1);
+
+        assertNotEquals(Status.DONE, epic.getStatus(), "Статусы совпадают.");
     }
 
     @Test
     public void shouldGetNullTaskWithWrongId () { // должны получить null task с неправильным id
         assertNull(TASK_MANAGER.getTask(0));
     }
+
+    @Test
+    public void shouldGetNullSubtaskWithWrongId () { // должны получить null subtask с неправильным id
+        assertNull(TASK_MANAGER.getSubtask(0));
+    }
+
+    @Test
+    public void shouldGetNullEpicWithWrongId () { // должны получить null epic с неправильным id
+        assertNull(TASK_MANAGER.getEpic(0));
+    }
+
+    @Test
+    public void shouldGetSameTaskByCorrectId () { // должны получить одинаковые задачи по правильному id
+        assertEquals(task, TASK_MANAGER.getTask(task.getUniqueID()), "Задачи отличаются");
+    }
+
+    @Test
+    public void shouldGetSameSubtaskByCorrectId () { // должны получить одинаковые подзадачи по правильному id
+        assertEquals(subtask, TASK_MANAGER.getSubtask(subtask.getUniqueID()), "Задачи отличаются");
+    }
+
+    @Test
+    public void epicIdShouldBeSameBySubtaskInfo () { // по инфо подзадачи эпик id должен совпадать с эпиком в памяти
+        Epic epic1 = TASK_MANAGER.getEpic(subtask.getEpicId());
+
+        assertEquals(epic, epic1);
+    }
+
+    @Test
+    public void shouldGetSameEpicByCorrectId () { // должны получить одинаковые эпики по правильному id
+        assertEquals(epic, TASK_MANAGER.getEpic(epic.getUniqueID()), "Задачи отличаются");
+    }
+
+    @Test
+    public void shouldNotDeleteTaskWithWrongId () { // не должен удалять задачу с неправильным id
+        assertNotNull(task, "Задача удалилась!");
+    }
+
+    @Test
+    public void shouldNotDeleteSubtaskWithWrongId () { // не должен удалять подзадачу с неправильным id
+        assertNotNull(subtask, "Подзадача удалилась!");
+    }
+
+    @Test
+    public void shouldNotDeleteEpicWithWrongId () { // не должен удалять эпик с неправильным id
+        assertNotNull(epic, "Эпик удалился!");
+    }
+
+    @AfterAll
+    public static void shouldDeleteTasks() { // объединяем тест на удаление задач, чтобы не нарушать очередность тестов
+        TASK_MANAGER.deleteTask(task.getUniqueID());
+
+        assertEquals(0, TASK_MANAGER.getTasks().size());
+
+        TASK_MANAGER.createTask(task); // возвращаем задачу для проверки удаления всех задач
+        Task task1 = new Task("testTask", "testDescription", 0, Status.NEW, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 15, 4));
+        TASK_MANAGER.createTask(task1);
+
+        assertEquals(2, TASK_MANAGER.getTasks().size());
+
+        TASK_MANAGER.deleteAllTasks();
+
+        assertEquals(0, TASK_MANAGER.getTasks().size());
+    }
+
+    @AfterAll
+    public static void shouldDeleteSubtasks() { // объединяем тест на удаление подзадач
+        TASK_MANAGER.deleteSubTask(subtask.getUniqueID());
+
+        assertEquals(0, TASK_MANAGER.getSubtasks().size());
+
+        TASK_MANAGER.createSubTask(subtask); // возвращаем подзадачу для следующих тестов
+        SubTask subTask1 = new SubTask("testSubtask", "testDescription", 0, Status.NEW, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 14, 2), 2);
+        TASK_MANAGER.createSubTask(subTask1);
+
+        assertEquals(2, TASK_MANAGER.getSubtasks().size());
+
+        TASK_MANAGER.deleteAllSubTasks();
+        assertEquals(0, TASK_MANAGER.getSubtasks().size());
+    }
+
+    @AfterAll
+    public static void shouldDeleteEpics() { // объединяем тест на удаление эпиков, проверяем удаление подзадач
+        TASK_MANAGER.deleteEpic(epic.getUniqueID());
+
+        assertEquals(0, TASK_MANAGER.getEpics().size());
+        assertEquals(0, epic.getSubtaskIds().size());
+        assertEquals(0, TASK_MANAGER.getSubtasks().size());
+
+        TASK_MANAGER.createEpic(epic); // возвращаем эпик для следующих тестов
+        Epic epic1 = new Epic("testEpic", "testDescription", 0, Status.NEW);
+        TASK_MANAGER.createEpic(epic1);
+
+        assertEquals(2, TASK_MANAGER.getEpics().size());
+
+        TASK_MANAGER.deleteAllEpics();
+        assertEquals(0, TASK_MANAGER.getEpics().size());
+
+        assertEquals(0, epic.getSubtaskIds().size());
+        assertEquals(0, TASK_MANAGER.getSubtasks().size());
+    }
+
 }
