@@ -119,7 +119,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public static FileBackedTaskManager loadFromFile(File file) throws FileNotFoundException {
         final FileBackedTaskManager taskManager = new FileBackedTaskManager(file.toString());
         try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
-            String line = null;
+            String line;
             while (!(line = br.readLine()).isBlank()) {
 
                 if (!line.contains("id,type")) {
@@ -258,6 +258,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
         fileBackedTaskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 11, 4)));
+
+        //fileBackedTaskManager.createTask(new Task("sample", "just for fun", 0, Status.NEW));// проверка реакции на null дату
 
         fileBackedTaskManager.createEpic(new Epic("epic epic", "got three subtasks", 0, Status.NEW));
         fileBackedTaskManager.createSubTask(new SubTask("first subtask", "am I the startTime?", 0,

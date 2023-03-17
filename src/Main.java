@@ -13,6 +13,8 @@ public class Main {
 
         final TaskManager taskManager = Managers.getDefault();
 
+        //taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW)); для проверки сортировки в конец по null
+
         taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 15, 4)));
 

@@ -6,6 +6,7 @@ import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -21,9 +22,9 @@ public class InMemoryTaskManager implements TaskManager{
     protected final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    protected Comparator<Task> taskComparator = (o1, o2) -> { // todo make some kind of null sorting thing...
+    protected Comparator<Task> taskComparator = (o1, o2) -> {
             if (o1.getStartTime() == null || o2.getStartTime() == null) {
-                return 0;
+                return -1;
             }
             return o1.getStartTime().compareTo(o2.getStartTime());
     };
@@ -201,7 +202,7 @@ public class InMemoryTaskManager implements TaskManager{
             return true;
         }
         for (Task task1 : prioritized) {
-            if (task.equals(task1)) {
+            if (task.equals(task1) || task1.getStartTime() == null) {
                 continue;
             }
             /* пусть первая задача 14:02 // endTime 14:17
@@ -226,20 +227,25 @@ public class InMemoryTaskManager implements TaskManager{
 
     private void checkEpicStartTimeAndDuration(Epic epic) {
         SubTask subTask = getSubtask(epic.getSubtaskIds().get(0)); // берем подзадачу по первому индексу эпика
-        LocalDateTime minStartTime = subTask.getStartTime(); // и задаем минимум для начального времени
-        int duration = 0;
+        LocalDateTime minStartTime = subTask.getStartTime(); // задаем минимум для начального времени
+        LocalDateTime maxEndTime = subTask.getEndTime(); // задаем минимум для конечного времени
+        int duration;
         for (Integer subtaskId : epic.getSubtaskIds()) {
             subTask = getSubtask(subtaskId);
             if (subTask.getStartTime().isBefore(minStartTime)) {
                 minStartTime = subTask.getStartTime();
             }
 
-            duration += subTask.getDuration(); // todo maybe find maxTime and duration is start minus endTime?
+            if (subTask.getEndTime().isAfter(maxEndTime)) {
+                maxEndTime = subTask.getEndTime();
+            }
         }
+
+        duration = (int) ChronoUnit.MINUTES.between(minStartTime, maxEndTime);
 
         epic.setStartTime(minStartTime);
         epic.setDuration(duration);
-        epic.setEndTime(minStartTime.plusMinutes(duration));
+        epic.setEndTime(maxEndTime);
     }
 
     @Override
