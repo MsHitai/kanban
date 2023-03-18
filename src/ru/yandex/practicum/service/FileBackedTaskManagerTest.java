@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.enums.Status;
@@ -17,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
-    private static FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
+    private static final FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save.csv");
 
     @BeforeAll
     public static void createTasksForTesting() { // создаем по 1 задаче для тестирования, чтобы id эпика был зафиксирован
@@ -216,11 +217,63 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
 
     @Test
     public void shouldThrowExceptionWithWrongPath () { // должен выбрасывать исключение при загрузке из неправ файла
-        assertThrows(FileNotFoundException.class, () -> {
-            FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(new File
-                    ("resources/wrongFile.csv"));
-        });
+        assertThrows(FileNotFoundException.class, () -> FileBackedTaskManager.loadFromFile(new File
+                ("resources/wrongFile.csv")));
     }
 
+    @AfterAll
+    public static void shouldDeleteTasks() { // объединяем тест на удаление задач, чтобы не нарушать очередность тестов
+        fileBackedTaskManager.deleteTask(task.getUniqueID());
 
+        assertEquals(0, fileBackedTaskManager.getTasks().size());
+
+        fileBackedTaskManager.createTask(task); // возвращаем задачу для проверки удаления всех задач
+        Task task1 = new Task("testTask", "testDescription", 0, Status.NEW, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 15, 4));
+        fileBackedTaskManager.createTask(task1);
+
+        assertEquals(2, fileBackedTaskManager.getTasks().size());
+
+        fileBackedTaskManager.deleteAllTasks();
+
+        assertEquals(0, fileBackedTaskManager.getTasks().size());
+    }
+
+    @AfterAll
+    public static void shouldDeleteSubtasks() { // объединяем тест на удаление подзадач
+        fileBackedTaskManager.deleteSubTask(subtask.getUniqueID());
+
+        assertEquals(0, fileBackedTaskManager.getSubtasks().size());
+
+        fileBackedTaskManager.createSubTask(subtask); // возвращаем подзадачу для следующих тестов
+        SubTask subTask1 = new SubTask("testSubtask", "testDescription", 0, Status.NEW, 15,
+                LocalDateTime.of(2023, Month.MARCH, 16, 14, 2), 2);
+        fileBackedTaskManager.createSubTask(subTask1);
+
+        assertEquals(2, fileBackedTaskManager.getSubtasks().size());
+
+        fileBackedTaskManager.deleteAllSubTasks();
+        assertEquals(0, fileBackedTaskManager.getSubtasks().size());
+    }
+
+    @AfterAll
+    public static void shouldDeleteEpics() { // объединяем тест на удаление эпиков, проверяем удаление подзадач
+        fileBackedTaskManager.deleteEpic(epic.getUniqueID());
+
+        assertEquals(0, fileBackedTaskManager.getEpics().size());
+        assertEquals(0, epic.getSubtaskIds().size());
+        assertEquals(0, fileBackedTaskManager.getSubtasks().size());
+
+        fileBackedTaskManager.createEpic(epic); // возвращаем эпик для следующих тестов
+        Epic epic1 = new Epic("testEpic", "testDescription", 0, Status.NEW);
+        fileBackedTaskManager.createEpic(epic1);
+
+        assertEquals(2, fileBackedTaskManager.getEpics().size());
+
+        fileBackedTaskManager.deleteAllEpics();
+        assertEquals(0, fileBackedTaskManager.getEpics().size());
+
+        assertEquals(0, epic.getSubtaskIds().size());
+        assertEquals(0, fileBackedTaskManager.getSubtasks().size());
+    }
 }

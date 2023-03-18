@@ -133,7 +133,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                             }
                             taskManager.tasks.put(task.getUniqueID(), task);
                             break; // Патимат, если мы напрямую кладем в мапу, после загрузки если создадим задачу,
-                        // id сгенерируется 1 и затрет эту задачу, может поменять все-таки на createTask(task)?
+                                // id сгенерируется 1 и затрет эту задачу, может поменять все-таки на createTask(task)?
                         case EPIC:
                             Epic epic = (Epic) fromString(line);
                             if (epic == null) {
@@ -276,11 +276,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         fileBackedTaskManager.getTask(1);
 
         // 2 сценарий:
-        /*FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new
-                File("resources/save.csv"));*/
+        FileBackedTaskManager fileBackedTaskManager2 = FileBackedTaskManager.loadFromFile(new
+                File("resources/save.csv"));
 
 
-        System.out.println(fileBackedTaskManager.getTasks());
+        System.out.println(fileBackedTaskManager2.getTasks());
         System.out.println(fileBackedTaskManager.getEpics());
         System.out.println(fileBackedTaskManager.getSubtasks());
 
