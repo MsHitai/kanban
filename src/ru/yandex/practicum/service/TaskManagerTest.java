@@ -82,8 +82,6 @@ class TaskManagerTest<T extends TaskManager> {
         assertEquals(subtask, prioritized.get(0), "Задачи не совпадают.");
     }
 
-    // todo проверить prioritized tasks на пересечения
-
     @Test
     public void shouldUpdateTaskStatus() { // должно быть возможным обновлять статус у задачи
         Task task1 = new Task("testTask", "testDescription", task.getUniqueID(), Status.DONE, 15,

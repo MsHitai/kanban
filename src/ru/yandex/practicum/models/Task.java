@@ -89,7 +89,7 @@ public class Task {
     public String toString() {
         String formattedTaskDate;
         String formattedEndTime;
-        if (startTime == null) { // чтобы не делать parse от null
+        if (startTime == null) { // чтобы не делать format от null
             formattedTaskDate = null;
             formattedEndTime = null;
         } else {

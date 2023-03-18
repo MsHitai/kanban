@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager{
 
     protected Comparator<Task> taskComparator = (o1, o2) -> {
             if (o1.getStartTime() == null || o2.getStartTime() == null) {
-                return -1;
+                return 1;
             }
             return o1.getStartTime().compareTo(o2.getStartTime());
     };
@@ -204,7 +204,7 @@ public class InMemoryTaskManager implements TaskManager{
             return true;
         }
         for (Task task1 : prioritized) {
-            if (task.equals(task1) || task1.getStartTime() == null) {
+            if (task.equals(task1) || task1.getStartTime() == null || task.getStartTime() == null) {
                 continue;
             }
             /* пусть первая задача 14:02 // endTime 14:17
@@ -234,6 +234,9 @@ public class InMemoryTaskManager implements TaskManager{
         int duration;
         for (Integer subtaskId : epic.getSubtaskIds()) {
             subTask = getSubtask(subtaskId);
+            if(subTask.getStartTime() == null) {
+                continue;
+            }
             if (subTask.getStartTime().isBefore(minStartTime)) {
                 minStartTime = subTask.getStartTime();
             }
