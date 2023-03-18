@@ -224,7 +224,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
             startTime = LocalDateTime.parse(fields[5], formatter);
         }
-        int duration = Integer.parseInt(fields[6]); // todo after add for subtask move this above?
+        int duration = Integer.parseInt(fields[6]);
 
         switch (type) {
             case TASK:

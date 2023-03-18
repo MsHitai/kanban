@@ -230,7 +230,7 @@ public class InMemoryTaskManager implements TaskManager{
     private void checkEpicStartTimeAndDuration(Epic epic) {
         SubTask subTask = getSubtask(epic.getSubtaskIds().get(0)); // берем подзадачу по первому индексу эпика
         LocalDateTime minStartTime = subTask.getStartTime(); // задаем минимум для начального времени
-        LocalDateTime maxEndTime = subTask.getEndTime(); // задаем минимум для конечного времени // todo add null validation
+        LocalDateTime maxEndTime = subTask.getEndTime(); // задаем минимум для конечного времени
         int duration;
         for (Integer subtaskId : epic.getSubtaskIds()) {
             subTask = getSubtask(subtaskId);
