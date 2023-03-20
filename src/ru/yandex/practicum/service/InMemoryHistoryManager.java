@@ -38,18 +38,13 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
     }
 
     private static class CustomLinkedList<T> {
-        private int size;
         private Node<T> head;
         private Node<T> tail;
-
-        public CustomLinkedList() {
-            size = 0;
-        }
 
         public List<Task> getTasks() {
             List<Task> history = new ArrayList<>();
             Node<T> node = head;
-            for (int i = 0; i < size; i++) {
+            while (node != null) {
                 history.add((Task) node.task);
                 node = node.next;
             }
@@ -57,38 +52,36 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         }
 
         public void linkLast(T task) {
-            Node<T> node = new Node<>(null, task, null);
+            final Node<T> prev = tail;
+            final Node<T> node = new Node<>(prev, task, null);
 
-            if (size == 0) {
-                this.head = node;
-                this.tail = node;
+            tail = node;
+            if (prev != null) {
+                prev.next = node;
             } else {
-                node.prev = tail;
-                tail.next = node;
-                tail = node;
+                head = node;
             }
-            size++;
         }
 
         public void removeNode(Node<T> node) {
             if (node == null) {
                 return;
             }
-            if (size == 1) {
-                head = null;
-                tail = null;
-            } else if (node == head) {
-                head = head.next;
-                head.prev = null;
-            } else if (node == tail) {
-                tail = tail.prev;
-                tail.next = null;
+            if (node.prev != null) {
+                node.prev.next = node.next;
+                if (node.next == null) { // node == next
+                    tail = node.prev;
+                } else {
+                    node.next.prev = node.prev;
+                }
             } else {
-                Node<T> before = node.prev;
-                before.next = before.next.next;
-                before.next.prev = before;
+                head = node.next;
+                if (head == null) {
+                    tail = null;
+                } else {
+                    head.prev = null;
+                }
             }
-            size--;
         }
     }
 }

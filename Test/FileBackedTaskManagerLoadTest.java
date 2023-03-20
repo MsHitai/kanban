@@ -1,11 +1,12 @@
-package ru.yandex.practicum.service;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.Epic;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
+import ru.yandex.practicum.service.FileBackedTaskManager;
+import ru.yandex.practicum.service.HistoryManager;
+import ru.yandex.practicum.service.InMemoryHistoryManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,7 +62,7 @@ class FileBackedTaskManagerLoadTest {
 
     @Test
     public void shouldBeThreeTasksInHistory () { // должно быть 3 задачи в истории с нужными id
-        HistoryManager<Task> historyManager = fileBackedTaskManager.getHistoryManager();
+        HistoryManager<Task> historyManager = new InMemoryHistoryManager<>();
 
         assertEquals(3, historyManager.getHistory().size());
 

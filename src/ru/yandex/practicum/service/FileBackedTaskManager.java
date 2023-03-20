@@ -120,37 +120,38 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         final FileBackedTaskManager taskManager = new FileBackedTaskManager(file.toString());
         try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
             String line;
+            //int uniqueId = 0;
             while (!(line = br.readLine()).isBlank()) {
 
                 if (!line.contains("id,type")) {
-                    String[] types = line.split(",");
-                    Tasks type = Tasks.valueOf(types[1]);
-                    switch (type) {
+
+                    Task task = fromString(line);
+                    if (task == null) {
+                        continue;
+                    }
+                    /*final int id = task.getUniqueID();
+                    if (id > uniqueId) {
+                        uniqueId = id;
+                    }*/
+                    switch (task.getType()) {
                         case TASK:
-                            Task task = fromString(line);
-                            if (task == null) {
-                                break;
-                            }
-                            taskManager.tasks.put(task.getUniqueID(), task);
-                            break; // Патимат, если мы напрямую кладем в мапу, после загрузки если создадим задачу,
-                                // id сгенерируется 1 и затрет эту задачу, может поменять все-таки на createTask(task)?
+                            /*taskManager.prioritizedTasks.add(task);
+                            taskManager.tasks.put(task.getUniqueID(), task);*/
+                            taskManager.createTask(task);
+                            break;
                         case EPIC:
-                            Epic epic = (Epic) fromString(line);
-                            if (epic == null) {
-                                break;
-                            }
-                            taskManager.epics.put(epic.getUniqueID(), epic);
+                            //taskManager.epics.put(task.getUniqueID(), (Epic) task);
+                            taskManager.createEpic((Epic) task);
                             break;
                         case SUBTASK:
-                            SubTask subTask = (SubTask) fromString(line);
-                            if (subTask == null) {
-                                break;
-                            }
-                            taskManager.subtasks.put(subTask.getUniqueID(), subTask);
+                            /*taskManager.prioritizedTasks.add(task); // в этом случае подзадачи с пересечением добавляются
+                            taskManager.subtasks.put(task.getUniqueID(), (SubTask) task);*/
+                            taskManager.createSubTask((SubTask) task); // здесь запускается проверка по приоритету
                             break;
                     }
                 }
             }
+            //taskManager.uniqueId = uniqueId;
             if (br.ready()) {
                 line = br.readLine();
                 List<Integer> loadedHistory = historyFromString(line);
@@ -274,17 +275,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 7), 2));
 
         fileBackedTaskManager.getTask(1);
+        fileBackedTaskManager.getHistory();
 
-        // 2 сценарий:
-        FileBackedTaskManager fileBackedTaskManager2 = FileBackedTaskManager.loadFromFile(new
-                File("resources/save.csv"));
-
-
-        System.out.println(fileBackedTaskManager2.getTasks());
+        System.out.println(fileBackedTaskManager.getTasks());
         System.out.println(fileBackedTaskManager.getEpics());
         System.out.println(fileBackedTaskManager.getSubtasks());
 
-        fileBackedTaskManager.getHistory();
+        System.out.println(fileBackedTaskManager.getPrioritizedTasks());
+
+        FileBackedTaskManager fileBackedTaskManager2 = FileBackedTaskManager.loadFromFile(new
+                File("resources/save.csv"));
+
+        fileBackedTaskManager2.getHistory();
+        System.out.println(fileBackedTaskManager2.getPrioritizedTasks());
 
     }
 }

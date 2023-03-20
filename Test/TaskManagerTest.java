@@ -1,9 +1,9 @@
-package ru.yandex.practicum.service;
-
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.models.Epic;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
+import ru.yandex.practicum.service.Managers;
+import ru.yandex.practicum.service.TaskManager;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 
