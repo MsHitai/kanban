@@ -1,17 +1,17 @@
+package ru.yandex.practicum.service;
+
 import org.junit.jupiter.api.*;
 import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.Epic;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
-import ru.yandex.practicum.service.FileBackedTaskManager;
-import ru.yandex.practicum.service.HistoryManager;
-import ru.yandex.practicum.service.InMemoryHistoryManager;
 
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,22 +48,27 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test // должен загружать из файла
     public void shouldLoadFromFile () throws FileNotFoundException {
-        taskManager = FileBackedTaskManager.loadFromFile(new File(file.toString()));
 
-        assertEquals(1, taskManager.getTasks().size());
+        List<Task> historyTasks = taskManager.getHistoryManager().getHistory();
+
+        assertEquals(2, historyTasks.size()); // подзадача вызывает эпик, метод апдейт вызывает подзадачу
 
         taskManager.getTask(1);
 
-        assertEquals(1, taskManager.getSubtasks().size());
+        historyTasks = taskManager.getHistoryManager().getHistory();
 
-        taskManager.getSubtask(3);
+        assertEquals(3, historyTasks.size());
 
-        taskManager.getEpic(2);
+        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(new File(file.toString()));
 
-        HistoryManager<Task> historyManager = new InMemoryHistoryManager<>();
+        assertEquals(1, fileBackedTaskManager.getTasks().size());
 
-        assertEquals(3, historyManager.getHistory().size());
+        assertEquals(1, fileBackedTaskManager.getSubtasks().size());
 
+        assertEquals(1, fileBackedTaskManager.getEpics().size());
 
+        List<Task> tasksHistory = fileBackedTaskManager.getHistoryManager().getHistory();
+
+        assertEquals(3, tasksHistory.size());
     }
 }

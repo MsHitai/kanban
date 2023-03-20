@@ -97,30 +97,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public Task getTask(int id) { // переопределяем эти методы, чтобы сохранять историю, когда обращаемся к задачам
-        super.getTask(id);
+        Task task = super.getTask(id);
         save();
-        return super.getTask(id);
+        return task;
     }
 
     @Override
     public SubTask getSubtask(int id) {
-        super.getSubtask(id);
+        SubTask subTask = super.getSubtask(id);
         save();
-        return super.getSubtask(id);
+        return subTask;
     }
 
     @Override
     public Epic getEpic(int id) {
-        super.getEpic(id);
+        Epic epic = super.getEpic(id);
         save();
-        return super.getEpic(id);
+        return epic;
     }
 
     public static FileBackedTaskManager loadFromFile(File file) throws FileNotFoundException {
         final FileBackedTaskManager taskManager = new FileBackedTaskManager(file.toString());
         try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
             String line;
-            //int uniqueId = 0;
             while (!(line = br.readLine()).isBlank()) {
 
                 if (!line.contains("id,type")) {
@@ -129,29 +128,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     if (task == null) {
                         continue;
                     }
-                    /*final int id = task.getUniqueID();
-                    if (id > uniqueId) {
-                        uniqueId = id;
-                    }*/
                     switch (task.getType()) {
                         case TASK:
-                            /*taskManager.prioritizedTasks.add(task);
-                            taskManager.tasks.put(task.getUniqueID(), task);*/
                             taskManager.createTask(task);
                             break;
                         case EPIC:
-                            //taskManager.epics.put(task.getUniqueID(), (Epic) task);
                             taskManager.createEpic((Epic) task);
                             break;
                         case SUBTASK:
-                            /*taskManager.prioritizedTasks.add(task); // в этом случае подзадачи с пересечением добавляются
-                            taskManager.subtasks.put(task.getUniqueID(), (SubTask) task);*/
-                            taskManager.createSubTask((SubTask) task); // здесь запускается проверка по приоритету
+                            taskManager.createSubTask((SubTask) task);
                             break;
                     }
                 }
             }
-            //taskManager.uniqueId = uniqueId;
             if (br.ready()) {
                 line = br.readLine();
                 List<Integer> loadedHistory = historyFromString(line);

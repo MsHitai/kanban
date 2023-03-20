@@ -9,7 +9,7 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
 
     CustomLinkedList<Task> historyTasks = new CustomLinkedList<>();
 
-    protected static Map<Integer, Node<Task>> sortingTasks = new HashMap<>();
+    protected final Map<Integer, Node<Task>> sortingTasks = new HashMap<>(); // ошибка в истории была из-за static
 
     @Override
     public void add(Task task) {
@@ -37,7 +37,7 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         return historyTasks.getTasks();
     }
 
-    private static class CustomLinkedList<T> {
+    private class CustomLinkedList<T> {
         private Node<T> head;
         private Node<T> tail;
 
