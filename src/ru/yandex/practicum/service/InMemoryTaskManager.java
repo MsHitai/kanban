@@ -252,11 +252,14 @@ public class InMemoryTaskManager implements TaskManager{
     public void deleteEpic(int id) {
         if (epics.containsKey(id)) {
             ArrayList<Integer> tasksId = getEpic(id).getSubtaskIds();
+            ArrayList<Integer> subsToDelete = new ArrayList<>();
             if (tasksId != null) {
                 for (Integer subtaskId : tasksId) {
                     historyManager.remove(subtaskId);
                     subtasks.remove(subtaskId);
+                    subsToDelete.add(subtaskId);
                 }
+                tasksId.removeAll(subsToDelete); // из самого списка tasksId не удаляли эти ид подзадач
                 epics.remove(id);
             }
             historyManager.remove(id);

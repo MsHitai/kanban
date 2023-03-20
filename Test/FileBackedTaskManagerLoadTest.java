@@ -16,8 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*происходит конфликт, если делаю сохранение и загрузку в одном тесте, могу разделить на два? конфликт с историей, так
-как в ней есть задача, которую я пытаюсь добавить, и из-за повтора она ее хочет удалить, это вызывает NullPointerException*/
 class FileBackedTaskManagerLoadTest {
 
     private static FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("resources/save2.csv");
