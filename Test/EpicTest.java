@@ -1,8 +1,9 @@
-package ru.yandex.practicum.models;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.enums.Status;
+import ru.yandex.practicum.models.Epic;
+import ru.yandex.practicum.models.SubTask;
+import ru.yandex.practicum.models.Task;
 import ru.yandex.practicum.service.InMemoryTaskManager;
 import ru.yandex.practicum.service.TaskManager;
 
