@@ -284,6 +284,9 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public ArrayList<SubTask> getSubTasksByEpics(Epic epic) {
         ArrayList<SubTask> tasks = new ArrayList<>();
+        if (epic == null) {
+            return null;
+        }
         for (int id : epic.getSubtaskIds()) {
             tasks.add(subtasks.get(id));
         }
@@ -291,8 +294,8 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
-    public void getHistory(){
-        System.out.println(historyManager.getHistory());
+    public List<Task> getHistory(){
+        return historyManager.getHistory();
     }
 
     @Override

@@ -3,9 +3,11 @@ import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
 import ru.yandex.practicum.server.HttpTaskServer;
+import ru.yandex.practicum.service.FileBackedTaskManager;
 import ru.yandex.practicum.service.Managers;
 import ru.yandex.practicum.service.TaskManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -13,13 +15,13 @@ import java.time.Month;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        TaskManager taskManager = Managers.getDefaultFile();
+        TaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("resources/save.csv"));
 
         //final TaskManager taskManager = Managers.getDefault();
 
         //taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW)); для проверки сортировки в конец по null
 
-        taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
+        /*taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 15, 4)));
 
         taskManager.createEpic(new Epic("epic epic", "got three subtasks", 0, Status.NEW));
@@ -36,7 +38,7 @@ public class Main {
 
         System.out.println("Создаем задачи...");
 
-        /*System.out.println("У нас создались следующие задачи: ");
+        System.out.println("У нас создались следующие задачи: ");
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getSubtasks());
         System.out.println(taskManager.getEpics());

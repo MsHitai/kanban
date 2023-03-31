@@ -264,7 +264,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 LocalDateTime.of(2023, Month.MARCH, 16, 14, 7), 2));
 
         fileBackedTaskManager.getTask(1);
-        fileBackedTaskManager.getHistory();
+        System.out.println(fileBackedTaskManager.getHistory());
 
         System.out.println(fileBackedTaskManager.getTasks());
         System.out.println(fileBackedTaskManager.getEpics());
@@ -275,7 +275,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         FileBackedTaskManager fileBackedTaskManager2 = FileBackedTaskManager.loadFromFile(new
                 File("resources/save.csv"));
 
-        fileBackedTaskManager2.getHistory();
+        System.out.println(fileBackedTaskManager2.getHistory());
         System.out.println(fileBackedTaskManager2.getPrioritizedTasks());
 
     }
