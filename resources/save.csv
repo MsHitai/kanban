@@ -1,9 +1,6 @@
 id,type,name,status,description,startTime,duration,endTime,epic 
-1,TASK,simple task,NEW,no big deal,16-03-23 15:04,15,16-03-23 15:19
-2,EPIC,epic epic,IN_PROGRESS,got three subtasks,16-03-23 14:02,33,16-03-23 14:35
-3,EPIC,epic epic,NEW,got zero subtasks,null,0,null
-4,SUBTASK,first subtask,NEW,am I the startTime?,16-03-23 14:02,15,16-03-23 14:17,2
-5,SUBTASK,second subtask,NEW,needed for date testing,16-03-23 14:20,15,16-03-23 14:35,2
-6,SUBTASK,third subtask,DONE,needed for time conflicts testing,16-03-23 14:07,15,16-03-23 14:22,2
+1,TASK,testTask,NEW,testDescription,16-03-23 15:04,15,16-03-23 15:19
+2,EPIC,testEpic,NEW,testDescription,16-03-23 14:02,15,16-03-23 14:17
+3,SUBTASK,testSubtask,NEW,testDescription,16-03-23 14:02,15,16-03-23 14:17,2
 
-4,5,6,2,3,
+2,3,1,

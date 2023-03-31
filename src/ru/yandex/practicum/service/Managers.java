@@ -2,10 +2,13 @@ package ru.yandex.practicum.service;
 
 import ru.yandex.practicum.models.Task;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 public class Managers {
 
-    public static TaskManager getDefault() {
-        return new InMemoryTaskManager(); // todo return FileManager
+    public static TaskManager getDefault() throws URISyntaxException, IOException, InterruptedException {
+        return new HttpTaskManager("http://localhost:8078/");
     }
 
     public static TaskManager getDefaultFile() {

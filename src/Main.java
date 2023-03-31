@@ -2,26 +2,24 @@ import ru.yandex.practicum.models.Epic;
 import ru.yandex.practicum.enums.Status;
 import ru.yandex.practicum.models.SubTask;
 import ru.yandex.practicum.models.Task;
-import ru.yandex.practicum.server.HttpTaskServer;
-import ru.yandex.practicum.service.FileBackedTaskManager;
+import ru.yandex.practicum.server.KVServer;
 import ru.yandex.practicum.service.Managers;
 import ru.yandex.practicum.service.TaskManager;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.Month;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
 
-        TaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("resources/save.csv"));
+        KVServer kvServer = new KVServer();
+        kvServer.start();
 
-        //final TaskManager taskManager = Managers.getDefault();
+        final TaskManager taskManager = Managers.getDefault();
 
-        //taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW)); для проверки сортировки в конец по null
-
-        /*taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
+        taskManager.createTask(new Task("simple task", "no big deal", 0, Status.NEW,
                 15, LocalDateTime.of(2023, Month.MARCH, 16, 15, 4)));
 
         taskManager.createEpic(new Epic("epic epic", "got three subtasks", 0, Status.NEW));
@@ -70,17 +68,13 @@ public class Main {
         System.out.println(taskManager.getPrioritizedTasks());
 
         System.out.println("История");
-        taskManager.getHistory();*/
+        taskManager.getHistory();
 
-        HttpTaskServer httpTaskServer = new HttpTaskServer(taskManager);
+        kvServer.stop();
 
-        httpTaskServer.start();
+        /*HttpTaskServer httpTaskServer = new HttpTaskServer(taskManager);
+
+        httpTaskServer.start();*/
 
     }
 }
-/*
-Код проверки в Main.main перестанет работать. потому что Managers.getDefault() теперь возвращает новую
-реализацию менеджера задач, а она не может работать без запуска сервера. Вам нужно это исправить.
-Добавьте запуск KVServer в Main.main и перезапустите пример использования менеджера. Убедитесь,
-что всё работает и состояние задач теперь хранится на сервере.
- */

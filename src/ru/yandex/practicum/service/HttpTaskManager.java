@@ -1,29 +1,39 @@
 package ru.yandex.practicum.service;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class HttpTaskManager extends FileBackedTaskManager{
+public class HttpTaskManager extends FileBackedTaskManager implements TaskManager {
 
+    private final KVTaskClient client;
 
-
-    public HttpTaskManager(String path) { // todo принимать URL к серверу KVServer
+    public HttpTaskManager(String path) throws URISyntaxException, IOException, InterruptedException {
         super(path);
+        URI uri = new URI(path);
+        client = new KVTaskClient(uri);
+        client.register();
+    }
+
+    @Override
+    protected void save() {
+        String value = separateTasksFromLists(super.getTasks()) +
+                separateTasksFromLists(super.getEpics()) +
+                separateTasksFromLists(super.getSubtasks()) +
+                "\n" +
+                historyToString(super.getHistoryManager());
+        try {
+            client.put("HttpTaskManager", value);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String load() throws IOException, InterruptedException {
+        return client.load("HttpTaskManager");
+    }
+
+    public KVTaskClient getClient() {
+        return client;
     }
 }
-
-/*
-HttpTaskManager создаёт KVTaskClient, из которого можно получить исходное состояние менеджера.
-Вам нужно заменить вызовы сохранения состояния в файлах на вызов клиента
- */
-
-// todo В конце обновите статический метод getDefault() в утилитарном классе Managers, чтобы он
-//  возвращал HttpTaskManager.
-
-/*
-Теперь можно добавить тесты для HttpTaskManager аналогично тому как сделали для
-FileBackedTasksManager , отличие только, вместо проверки восстановления состояния менеджера из
-файла, данные будут восстанавливаться с KVServerсервера.
-
-Если запускать новый сервер перед каждым тестом на том же порту, то потребуется остановить
-предыдущий. Для этого реализуйте метод stop() в KVServer. Его вызов поместите в отдельный метод
-в тестах. Пометьте его аннотацией @AfterEach.
- */

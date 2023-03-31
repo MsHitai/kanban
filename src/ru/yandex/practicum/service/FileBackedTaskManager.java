@@ -164,7 +164,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return taskManager;
     }
 
-    private void save() throws ManagerSaveException {
+    protected void save() throws ManagerSaveException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.path, false))) {
             bw.write("id,type,name,status,description,startTime,duration,endTime,epic \n");
             bw.write(separateTasksFromLists(super.getTasks()));
@@ -180,7 +180,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    private static String historyToString(HistoryManager<Task> historyManager) {
+    protected static String historyToString(HistoryManager<Task> historyManager) {
         StringBuilder sb = new StringBuilder();
         for (Task task : historyManager.getHistory()) {
             sb.append(task.getUniqueID());
@@ -235,7 +235,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return null;
     }
 
-    private String separateTasksFromLists(List<?> list) { //достаем задачи из списка по строкам, чтобы не было [] в save
+    protected String separateTasksFromLists(List<?> list) { //достаем задачи из списка по строкам, чтобы не было [] в save
         StringBuilder sb = new StringBuilder();
         for (Object task : list) {
             sb.append(task.toString());
