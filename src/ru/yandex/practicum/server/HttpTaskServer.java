@@ -140,6 +140,12 @@ public class HttpTaskServer {
                     } else {
                         String taskString = readText(httpExchange);
                         Task task = gson.fromJson(taskString, Task.class);
+                        if (task.getUniqueID() != id) { // иначе можно обновить задачу, если неправильную цифру указать в пути,
+                                                    // но при этом в памяти есть такая задача
+                            System.out.println("Идентификаторы задач не совпадают!");
+                            httpExchange.sendResponseHeaders(405, 0);
+                            return;
+                        }
                         taskManager.updateTask(task);
                         httpExchange.sendResponseHeaders(200, 0);
                     }
@@ -159,6 +165,11 @@ public class HttpTaskServer {
                     } else {
                         String subtaskString = readText(httpExchange);
                         SubTask subtask = gson.fromJson(subtaskString, SubTask.class);
+                        if (subtask.getUniqueID() != id) {
+                            System.out.println("Идентификаторы задач не совпадают!");
+                            httpExchange.sendResponseHeaders(405, 0);
+                            return;
+                        }
                         taskManager.updateSubTask(subtask);
                         httpExchange.sendResponseHeaders(200, 0);
                     }
@@ -178,6 +189,11 @@ public class HttpTaskServer {
                     } else {
                         String epicString = readText(httpExchange);
                         Epic epic = gson.fromJson(epicString, Epic.class);
+                        if (epic.getUniqueID() != id) {
+                            System.out.println("Идентификаторы задач не совпадают!");
+                            httpExchange.sendResponseHeaders(405, 0);
+                            return;
+                        }
                         taskManager.updateEpic(epic);
                         httpExchange.sendResponseHeaders(200, 0);
                     }
@@ -222,7 +238,7 @@ public class HttpTaskServer {
                     return;
                 }
                 if (pathParts[3].equals("epic")) { // ситуация где нам нужно вернуть подзадачи по эпику
-                    if (pathParts[4] == null) {
+                    if (pathParts.length == 4) {
                         System.out.println("Идентификатор не может быть пустым");
                         httpExchange.sendResponseHeaders(405, 0);
                         return;
@@ -237,7 +253,7 @@ public class HttpTaskServer {
                     response = gson.toJson(taskManager.getSubTasksByEpics(epic));
                     sendText(httpExchange, response);
                 } else {
-                    int id = parsePathId(pathParts[3]); // ситуация где нам нужно обновить нужную подзадачу по id
+                    int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
                         httpExchange.sendResponseHeaders(405, 0);
@@ -301,23 +317,5 @@ public class HttpTaskServer {
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
     }
+
 }
-
-/*
-HttpClient client = HttpClient.newHttpClient();
-URI url = URI.create("http://localhost:8080/tasks/task/");
-HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-URI url = URI.create("http://localhost:8080/tasks/task/");
-Gson gson = new Gson();
-String json = gson.toJson(newTask);
-final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-HttpClient client = HttpClient.newHttpClient();
-URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
-HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
- */
