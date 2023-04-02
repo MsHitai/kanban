@@ -19,14 +19,10 @@ public class KVTaskClient {
     public KVTaskClient(URI url) {
         this.url = url;
         httpClient = HttpClient.newHttpClient();
-        try {
-            apiToken = register();
-        } catch (IOException | InterruptedException e) {
-            throw new ManagerSaveException("Невозможно выполнить действие save");
-        }
+        apiToken = register();
     }
 
-    public String register() throws IOException, InterruptedException {
+    public String register() {
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url + "register/DEBUG")).GET().build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -76,7 +72,7 @@ public class KVTaskClient {
         return response.body();
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         KVServer kvServer = new KVServer();
         kvServer.start();
         URI uri = new URI("http://localhost:8078/");
