@@ -172,7 +172,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test /* должны получить ошибку, если указать вместо ид букву */
@@ -182,7 +182,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test /* должны получить ошибку, если указать неверный путь после /tasks */
@@ -192,7 +192,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test /* должны получить ошибку, если указать неверный метод */
@@ -220,7 +220,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test
@@ -332,7 +332,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test /* должны получить ошибку, если указать вместо цифры ид указать букву */
@@ -346,7 +346,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
 
         assertEquals(Status.NEW, taskManager.getTask(1).getStatus());
     }
@@ -362,7 +362,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
 
         assertEquals(Status.NEW, taskManager.getTask(1).getStatus());
     }
@@ -377,7 +377,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 
     @Test
@@ -495,7 +495,7 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
 
         assertEquals(1, taskManager.getSubtasks().size());
     }
@@ -510,6 +510,6 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
 
-        assertEquals(405, code);
+        assertEquals(400, code);
     }
 }

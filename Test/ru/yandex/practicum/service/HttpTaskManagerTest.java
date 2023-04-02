@@ -24,7 +24,7 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
     }
 
     @BeforeEach
-    void setUp() throws URISyntaxException, IOException, InterruptedException {
+    void setUp() throws URISyntaxException {
         kvServer.start();
         super.setTaskManager(new HttpTaskManager("http://localhost:8078/"));
         task = new Task("testTask", "testDescription", 0, Status.NEW, 15,
@@ -45,13 +45,13 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
     }
 
     @Test
-    void shouldLoadFromServer() throws IOException, InterruptedException {
-        String value = taskManager.load();
+    void shouldLoadFromServer() throws URISyntaxException {
+        HttpTaskManager newTaskManager = new HttpTaskManager("http://localhost:8078/");
 
-        KVTaskClient client = taskManager.getClient();
+        assertEquals(1, newTaskManager.tasks.size());
+        assertEquals(1, newTaskManager.subtasks.size());
+        assertEquals(1, newTaskManager.epics.size());
 
-        String body = client.load("HttpTaskManager");
-
-        assertEquals(value, body);
+        assertEquals(2, newTaskManager.getHistory().size());
     }
 }

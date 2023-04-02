@@ -190,7 +190,7 @@ public class InMemoryTaskManager implements TaskManager{
         }
     }
 
-    private boolean checkTimeClashes (Task task) { // проверяем пересечения времени
+    protected boolean checkTimeClashes (Task task) { // проверяем пересечения времени
         if (task == null) {
             return true;
         }

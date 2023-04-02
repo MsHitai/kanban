@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import ru.yandex.practicum.exceptions.ManagerSaveException;
 import ru.yandex.practicum.server.KVServer;
 
 import java.io.IOException;
@@ -13,35 +14,65 @@ import java.net.http.HttpResponse;
 public class KVTaskClient {
     private final URI url;
     private final HttpClient httpClient;
-    private String apiToken;
+    private final String apiToken;
 
     public KVTaskClient(URI url) {
         this.url = url;
         httpClient = HttpClient.newHttpClient();
-
+        try {
+            apiToken = register();
+        } catch (IOException | InterruptedException e) {
+            throw new ManagerSaveException("Невозможно выполнить действие save");
+        }
     }
 
-    public void register() throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url + "register/DEBUG")).GET().build();
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        apiToken = response.body();
+    public String register() throws IOException, InterruptedException {
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url + "register/DEBUG")).GET().build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Невозможно выполнить действие save, status code: " +
+                        response.statusCode());
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new ManagerSaveException("Невозможно выполнить действие save");
+        }
     }
 
-    public void put(String key, String json) throws IOException, InterruptedException {
+    public void put(String key, String json) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url + "save/" + key + "?API_TOKEN=" + apiToken))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Невозможно выполнить действие save, status code: " +
+                        response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new ManagerSaveException("Невозможно выполнить действие save");
+        }
         System.out.println(response);
     }
 
-    public String load(String key) throws IOException, InterruptedException {
+    public String load(String key) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url + "load/" + key + "?API_TOKEN=" + apiToken))
                 .GET()
                 .build();
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Невозможно выполнить действие load, status code: " +
+                        response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new ManagerSaveException("Невозможно выполнить действие load");
+        }
         return response.body();
     }
 
@@ -63,9 +94,3 @@ public class KVTaskClient {
         kvServer.stop();
     }
 }
-/*
-Далее проверьте код клиента в main. Для этого запустите KVServer, создайте экземпляр KVTaskClient.
-Затем сохраните значение под разными ключами и проверьте, что при запросе возвращаются нужные
-данные. Удостоверьтесь, что если изменить значение, то при повторном вызове вернётся уже не
-старое, а новое
- */

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.server;
 
+import static java.net.HttpURLConnection.*;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -45,7 +46,7 @@ public class HttpTaskServer {
                     break;
                 default:
                     System.out.println(method + " метод не поддерживается. Принимаются запросы GET, POST, или DELETE");
-                    httpExchange.sendResponseHeaders(405, 0);
+                    httpExchange.sendResponseHeaders(HTTP_BAD_METHOD, 0);
             }
 
         } catch (Exception exception) {
@@ -59,7 +60,7 @@ public class HttpTaskServer {
         String[] pathParts = httpExchange.getRequestURI().getPath().split("/");
         if (pathParts.length == 2) {
             System.out.println("Нужно указать тип задач для удаления");
-            httpExchange.sendResponseHeaders(405, 0);
+            httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
             return;
         }
         String type = pathParts[2];
@@ -68,51 +69,51 @@ public class HttpTaskServer {
             case "task":
                 if (pathParts.length == 3) {
                     taskManager.deleteAllTasks();
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         taskManager.deleteTask(id); // имеет ли смысл обрабатывать вариант, если id не найден, то код ответа не 200?
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
             case "subtask":
                 if (pathParts.length == 3) {
                     taskManager.deleteAllSubTasks();
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         taskManager.deleteSubTask(id);
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
             case "epic":
                 if (pathParts.length == 3) {
                     taskManager.deleteAllEpics();
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         taskManager.deleteEpic(id);
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
             default:
                 System.out.println("Тип задач не поддерживается");
-                httpExchange.sendResponseHeaders(405, 0);
+                httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
         }
     }
 
@@ -120,7 +121,7 @@ public class HttpTaskServer {
         String[] pathParts = httpExchange.getRequestURI().getPath().split("/");
         if (pathParts.length == 2) {
             System.out.println("Нужно указать тип задач для создания");
-            httpExchange.sendResponseHeaders(405, 0);
+            httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
             return;
         }
         String type = pathParts[2];
@@ -131,23 +132,23 @@ public class HttpTaskServer {
                     String taskString = readText(httpExchange);
                     Task task = gson.fromJson(taskString, Task.class);
                     taskManager.createTask(task);
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         String taskString = readText(httpExchange);
                         Task task = gson.fromJson(taskString, Task.class);
                         if (task.getUniqueID() != id) { // иначе можно обновить задачу, если неправильную цифру указать в пути,
                                                     // но при этом в памяти есть такая задача
                             System.out.println("Идентификаторы задач не совпадают!");
-                            httpExchange.sendResponseHeaders(405, 0);
+                            httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                             return;
                         }
                         taskManager.updateTask(task);
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
@@ -156,22 +157,22 @@ public class HttpTaskServer {
                     String subtaskString = readText(httpExchange);
                     SubTask subtask = gson.fromJson(subtaskString, SubTask.class);
                     taskManager.createSubTask(subtask);
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         String subtaskString = readText(httpExchange);
                         SubTask subtask = gson.fromJson(subtaskString, SubTask.class);
                         if (subtask.getUniqueID() != id) {
                             System.out.println("Идентификаторы задач не совпадают!");
-                            httpExchange.sendResponseHeaders(405, 0);
+                            httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                             return;
                         }
                         taskManager.updateSubTask(subtask);
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
@@ -180,28 +181,28 @@ public class HttpTaskServer {
                     String epicString = readText(httpExchange);
                     Epic epic = gson.fromJson(epicString, Epic.class);
                     taskManager.createEpic(epic);
-                    httpExchange.sendResponseHeaders(200, 0);
+                    httpExchange.sendResponseHeaders(HTTP_OK, 0);
                 } else {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         String epicString = readText(httpExchange);
                         Epic epic = gson.fromJson(epicString, Epic.class);
                         if (epic.getUniqueID() != id) {
                             System.out.println("Идентификаторы задач не совпадают!");
-                            httpExchange.sendResponseHeaders(405, 0);
+                            httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                             return;
                         }
                         taskManager.updateEpic(epic);
-                        httpExchange.sendResponseHeaders(200, 0);
+                        httpExchange.sendResponseHeaders(HTTP_OK, 0);
                     }
                 }
                 break;
             default:
                 System.out.println("Тип задач не поддерживается");
-                httpExchange.sendResponseHeaders(405, 0);
+                httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
         }
     }
 
@@ -224,7 +225,7 @@ public class HttpTaskServer {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         response = gson.toJson(taskManager.getTask(id));
                         sendText(httpExchange, response);
@@ -240,13 +241,13 @@ public class HttpTaskServer {
                 if (pathParts[3].equals("epic")) { // ситуация где нам нужно вернуть подзадачи по эпику
                     if (pathParts.length == 4) {
                         System.out.println("Идентификатор не может быть пустым");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                         return;
                     }
                     int id = parsePathId(pathParts[4]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                         return;
                     }
                     Epic epic = taskManager.getEpic(id);
@@ -256,7 +257,7 @@ public class HttpTaskServer {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         response = gson.toJson(taskManager.getSubtask(id));
                         sendText(httpExchange, response);
@@ -271,7 +272,7 @@ public class HttpTaskServer {
                     int id = parsePathId(pathParts[3]);
                     if (id == -1) {
                         System.out.println("Некорректный идентификатор");
-                        httpExchange.sendResponseHeaders(405, 0);
+                        httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
                     } else {
                         response = gson.toJson(taskManager.getEpic(id));
                         sendText(httpExchange, response);
@@ -284,7 +285,7 @@ public class HttpTaskServer {
                 break;
             default:
                 System.out.println("Тип задач не поддерживается");
-                httpExchange.sendResponseHeaders(405, 0);
+                httpExchange.sendResponseHeaders(HTTP_BAD_REQUEST, 0);
         }
     }
 
@@ -314,7 +315,7 @@ public class HttpTaskServer {
     private void sendText(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json");
-        h.sendResponseHeaders(200, resp.length);
+        h.sendResponseHeaders(HTTP_OK, resp.length);
         h.getResponseBody().write(resp);
     }
 
