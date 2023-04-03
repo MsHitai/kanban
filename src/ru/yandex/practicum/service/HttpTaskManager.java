@@ -9,6 +9,7 @@ import ru.yandex.practicum.models.Task;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HttpTaskManager extends FileBackedTaskManager implements TaskManager {
 
@@ -16,10 +17,16 @@ public class HttpTaskManager extends FileBackedTaskManager implements TaskManage
     private final Gson gson = new Gson();
 
     public HttpTaskManager(String path) throws URISyntaxException {
+        this(path, false);
+    }
+
+    public HttpTaskManager(String path, boolean load) throws URISyntaxException {
         super(null);
         URI uri = new URI(path);
         client = new KVTaskClient(uri);
-        load();
+        if (load) {
+            load();
+        }
     }
 
     @Override
@@ -38,16 +45,22 @@ public class HttpTaskManager extends FileBackedTaskManager implements TaskManage
     }
 
     private void load() {
-        loadTasks();
-        loadEpics();
-        loadSubtasks();
+        ArrayList<Task> tasks = gson.fromJson(client.load("tasks"), new TypeToken<ArrayList<Task>>() {
+        }.getType());
+        addTasks(tasks);
+
+        ArrayList<Epic> epics = gson.fromJson(client.load("epics"), new TypeToken<ArrayList<Epic>>() {
+        }.getType());
+        addTasks(epics);
+
+        ArrayList<SubTask> subtasks = gson.fromJson(client.load("subtasks"), new TypeToken<ArrayList<SubTask>>() {
+        }.getType());
+        addTasks(subtasks);
+
         loadHistory();
     }
 
-    private void loadTasks() {
-        ArrayList<Task> tasks = gson.fromJson(client.load("tasks"), new TypeToken<ArrayList<Task>>() {
-        }.getType());
-
+    protected void addTasks(List<? extends Task> tasks) {
         if (tasks == null) {
             return;
         }
@@ -57,45 +70,18 @@ public class HttpTaskManager extends FileBackedTaskManager implements TaskManage
             if (id > this.uniqueId) {
                 this.uniqueId = id;
             }
-            this.tasks.put(id, task);
-            if (checkTimeClashes(task)) {
-                prioritizedTasks.add(task);
-            }
-        }
-    }
-
-    private void loadEpics() {
-        ArrayList<Epic> epics = gson.fromJson(client.load("epics"), new TypeToken<ArrayList<Epic>>() {
-        }.getType());
-
-        if (epics == null) {
-            return;
-        }
-
-        for (Epic epic : epics) {
-            final int id = epic.getUniqueID();
-            if (id > this.uniqueId) {
-                this.uniqueId = id;
-            }
-            this.epics.put(id, epic);
-        }
-    }
-
-    private void loadSubtasks() {
-        ArrayList<SubTask> subtasks = gson.fromJson(client.load("subtasks"), new TypeToken<ArrayList<SubTask>>() {
-        }.getType());
-
-        if (subtasks == null) {
-            return;
-        }
-
-        for (SubTask subTask : subtasks) {
-            final int id = subTask.getUniqueID();
-            if (id > this.uniqueId) {
-                this.uniqueId = id;
-            }
-            if (checkTimeClashes(subTask)) {
-                this.subtasks.put(id, subTask);
+            if (task instanceof Epic) {
+                this.epics.put(id, (Epic) task);
+            } else if (task instanceof SubTask) {
+                this.subtasks.put(id, (SubTask) task);
+                if (checkTimeClashes(task)) {
+                    prioritizedTasks.add(task);
+                }
+            } else {
+                this.tasks.put(id, task);
+                if (checkTimeClashes(task)) {
+                    prioritizedTasks.add(task);
+                }
             }
         }
     }
@@ -112,11 +98,11 @@ public class HttpTaskManager extends FileBackedTaskManager implements TaskManage
             int id = task.getUniqueID();
 
             if (this.tasks.containsKey(id)) {
-                getTask(id);
+                getHistoryManager().add(tasks.get(id));
             } else if (this.epics.containsKey(id)) {
-                getEpic(id);
+                getHistoryManager().add(epics.get(id));
             } else if (this.subtasks.containsKey(id)) {
-                getSubtask(id);
+                getHistoryManager().add(subtasks.get(id));
             }
         }
     }

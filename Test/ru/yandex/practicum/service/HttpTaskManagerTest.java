@@ -46,7 +46,7 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
 
     @Test
     void shouldLoadFromServer() throws URISyntaxException {
-        HttpTaskManager newTaskManager = new HttpTaskManager("http://localhost:8078/");
+        HttpTaskManager newTaskManager = new HttpTaskManager("http://localhost:8078/", true);
 
         assertEquals(1, newTaskManager.tasks.size());
         assertEquals(1, newTaskManager.subtasks.size());
